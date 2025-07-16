@@ -1,0 +1,14 @@
+.app {
+	padding: 30px;
+	display: flex;
+}
+
+.app > div {
+	margin-right: 50px;
+}
+
+.todolist {
+	background-color: burlywood;
+	border: 2px solid gray;
+	border-radius: 5px;
+}
