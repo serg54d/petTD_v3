@@ -1,6 +1,7 @@
 .app {
 	padding: 30px;
 	display: flex;
+	
 }
 
 .app > div {
@@ -11,4 +12,29 @@
 	background-color: burlywood;
 	border: 2px solid gray;
 	border-radius: 5px;
+	padding: 15px;
+}
+
+.task {
+	padding: 5px;
+	font-weight: 600;
+}
+
+.task-done {
+	text-decoration: line-through;
+	opacity: 0.6;
+	padding: 5px;
+}
+
+.btn-filter-active {
+	background-color: rgb(194, 133, 54);
+	color: white;
+}
+
+li {
+	list-style: none;
+}
+
+.input-error {
+	border: 2px solid red;
 }
