@@ -30,7 +30,7 @@ function App() {
       title: "Todolist-2",
     },
   ]);
-  console.log(todolists);
+
   const [tasks, setTasks] = useState<TasksStateType>({
     [todolistId_1]: [
       { id: v1(), isDone: true, text: "1" },
@@ -44,7 +44,7 @@ function App() {
       { id: v1(), isDone: true, text: "4" },
     ],
   });
-  console.log(tasks);
+
   const removeTask = (taskId: string, todolistId: string) => {
     setTasks({
       ...tasks,
