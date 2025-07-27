@@ -25,11 +25,11 @@ body {
 }
 
 .app {
-	padding: 1rem;
+	/* padding: 1rem; */
 	min-height: 100vh;
 }
 
-.app-header {
+.app_add-todolist {
 	text-align: center;
 	margin-bottom: 1.5rem;
 	padding: 0.5rem;
@@ -96,8 +96,8 @@ body {
 	flex-grow: 1;
 	padding: 0.25rem;
 	word-break: break-word;
+	overflow: hidden;
 	font-size: 0.9rem;
-	
 }
 
 .task-done .task-text {
@@ -265,4 +265,32 @@ button:disabled {
 		font-size: 0.75rem;
 		padding: 0.4rem;
 	}
+}
+
+
+/* Dark mode styles */
+body.dark {
+  --primary-color: #6d9ee6;
+  --secondary-color: #4a8bb8;
+  --accent-color: #6fd8ff;
+  background-color: #121212;
+  color: #e0e0e0;
+}
+
+body.dark .todolist,
+body.dark .task-item {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+}
+
+body.dark .task-text {
+  color: #e0e0e0;
+}
+
+body.dark .task-done .task-text {
+  color: #a0a0a0;
+}
+
+body.dark .MuiTextField-root .MuiOutlinedInput-root {
+  color: #e0e0e0;
 }

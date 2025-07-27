@@ -1,5 +1,8 @@
 import { useState, KeyboardEvent } from "react";
-import { Button } from "./Button";
+import AddTaskIcon from "@mui/icons-material/AddTask";
+import IconButton from "@mui/material/IconButton";
+import TextField from "@mui/material/TextField";
+import { Box } from "@mui/material";
 
 type AddItemFormProps = {
   addItem: (title: string) => void;
@@ -40,28 +43,38 @@ export const AddItemForm = ({ addItem }: AddItemFormProps) => {
   };
 
   return (
-    <div className="add-item-form">
-      <div className="form-control">
-        <input
-          className={`task-input ${inputError ? "input-error" : ""}`}
-          placeholder={`Add text (max ${MAX_TITLE_LENGTH} chars)`}
+    <Box sx={{ mb: 3 }}>
+      <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+        <TextField
           value={itemTitle}
           onChange={(e) => handleInputChange(e.currentTarget.value)}
           onKeyDown={handleKeyDown}
+          label={`Add text (max ${MAX_TITLE_LENGTH} chars)`}
+          variant="outlined"
+          fullWidth
+          size="small"
+          error={!!inputError}
+          color="secondary"
+        
         />
-        <Button
-          className="add-button"
+        <IconButton
           onClick={handleAddItem}
-          title={"Add"}
-          isDisabled={!isTitleLengthValid}
-        />
-      </div>
+          color={isTitleLengthValid && !inputError ? "primary" : "error"}
+        
+        >
+          <AddTaskIcon />
+        </IconButton>
+      </Box>
       {!isTitleLengthValid && (
-        <div className="error-message">
+        <Box sx={{ color: "error.main", fontSize: "0.75rem", mt: 0.5 }}>
           Maximum length is {MAX_TITLE_LENGTH} characters
-        </div>
+        </Box>
       )}
-      {inputError && <div className="error-message">Title is required</div>}
-    </div>
+      {inputError && (
+        <Box sx={{ color: "error.main", fontSize: "0.75rem", mt: 0.5 }}>
+          Title is required
+        </Box>
+      )}
+    </Box>
   );
 };
