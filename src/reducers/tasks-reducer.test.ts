@@ -2,7 +2,13 @@ import { beforeEach, expect, test } from "vitest";
 import type { TasksStateType } from "../App";
 import { addTodolistAC, deleteTodolistAC } from "./todolists-reducer";
 import { v1 } from "uuid";
-import { tasksReducer } from "./tasks-reducer";
+import {
+  addTaskAC,
+  changeTaskStatusAC,
+  changeTaskTitleAC,
+  removeTaskAC,
+  tasksReducer,
+} from "./tasks-reducer";
 
 let startState: TasksStateType = {};
 
@@ -21,9 +27,11 @@ beforeEach(() => {
   };
 });
 
-
 test("array should be created for new todolist", () => {
-  const endState = tasksReducer(startState, addTodolistAC("New todolist", v1()));
+  const endState = tasksReducer(
+    startState,
+    addTodolistAC("New todolist", v1())
+  );
 
   const keys = Object.keys(endState);
   const newKey = keys.find((k) => k !== "todolistId1" && k !== "todolistId2");
@@ -44,4 +52,51 @@ test("property with todolistId should be deleted", () => {
   expect(endState["todolistId2"]).not.toBeDefined();
   // or
   expect(endState["todolistId2"]).toBeUndefined();
+});
+
+test("correct task should be deleted", () => {
+  const endState = tasksReducer(startState, removeTaskAC("todolistId2", "2"));
+
+  expect(endState).toEqual({
+    todolistId1: [
+      { id: "1", text: "CSS", isDone: false },
+      { id: "2", text: "JS", isDone: true },
+      { id: "3", text: "React", isDone: false },
+    ],
+    todolistId2: [
+      { id: "1", text: "bread", isDone: false },
+      { id: "3", text: "tea", isDone: false },
+    ],
+  });
+});
+
+test("correct task should be created at correct array", () => {
+  const endState = tasksReducer(
+    startState,
+    addTaskAC("todolistId2", "juice", v1())
+  );
+
+  expect(endState.todolistId1.length).toBe(3);
+  expect(endState.todolistId2.length).toBe(4);
+  expect(endState.todolistId2[0].id).toBeDefined();
+  expect(endState.todolistId2[0].text).toBe("juice");
+  expect(endState.todolistId2[0].isDone).toBe(false);
+});
+
+test("correct task should change its status", () => {
+  const endState = tasksReducer(
+    startState,
+    changeTaskStatusAC("todolistId2", "2", false)
+  );
+
+  expect(endState.todolistId2[1].isDone).toBe(false);
+});
+
+test("correct task should change its title", () => {
+  const endState = tasksReducer(
+    startState,
+    changeTaskTitleAC("todolistId1", "2", "TS")
+  );
+
+  expect(endState.todolistId1[1].text).toBe('TS')
 });
