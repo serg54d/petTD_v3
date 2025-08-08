@@ -1,5 +1,5 @@
 import { CustomButton } from "./Button";
-import { FilterValuesType } from "./App";
+import { FilterValuesType } from "./AppWithReducers";
 
 type FilterButtonsProps = {
   filter: FilterValuesType;

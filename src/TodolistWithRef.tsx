@@ -1,6 +1,6 @@
 import { JSX, useRef } from "react";
 import { Button } from "./Button";
-import { FilterValuesType } from "./App";
+import { FilterValuesType } from "./AppWithReducers";
 
 export type TaskType = {
   id: string;

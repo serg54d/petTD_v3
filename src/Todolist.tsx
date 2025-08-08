@@ -1,4 +1,4 @@
-import { FilterValuesType } from "./App";
+import { FilterValuesType } from "./AppWithReducers";
 import { AddItemForm } from "./AddItemForm";
 import { List } from "@mui/material";
 import { TodolistHeader } from "./TodolistHeader";

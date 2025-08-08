@@ -1,4 +1,4 @@
-import { FilterValuesType, TodolistType } from "../App";
+import { FilterValuesType, TodolistType } from "../AppWithReducers";
 
 // types
 
@@ -21,19 +21,22 @@ export const deleteTodolistAC = (id: string) => {
   return { type: "DELETE-TODOLIST", payload: { id } } as const;
 };
 
-export const addTodolistAC = (title: string, id: string) => {
-  return { type: "ADD-TODOLIST", payload: { title, id } } as const;
+export const addTodolistAC = (payload: { title: string; id: string }) => {
+  return { type: "ADD-TODOLIST", payload } as const;
 };
 
-export const changeTodolistTitleAC = (id: string, newTitle: string) => {
-  return { type: "CHANGE-TITLE", payload: { id, newTitle } } as const;
+export const changeTodolistTitleAC = (payload: {
+  id: string;
+  newTitle: string;
+}) => {
+  return { type: "CHANGE-TITLE", payload } as const;
 };
 
-export const changeFilterTodolistAC = (
-  newFilter: FilterValuesType,
-  id: string
-) => {
-  return { type: "CHANGE-FILTER", payload: { newFilter, id } } as const;
+export const changeFilterTodolistAC = (payload: {
+  newFilter: FilterValuesType;
+  id: string;
+}) => {
+  return { type: "CHANGE-FILTER", payload } as const;
 };
 
 // reducer

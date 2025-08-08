@@ -56,11 +56,11 @@ function App() {
   // tasks
 
   const removeTask = (taskId: string, todolistId: string) => {
-    dispatchToTasks(removeTaskAC(todolistId, taskId));
+    dispatchToTasks(removeTaskAC({ todolistId, taskId }));
   };
 
   const addTask = (title: string, todolistId: string) => {
-    dispatchToTasks(addTaskAC(todolistId, title, v1()));
+    dispatchToTasks(addTaskAC({ todolistId, text: title, taskId: v1() }));
   };
 
   const changeTaskStatus = (
@@ -68,7 +68,9 @@ function App() {
     todolistId: string,
     newStatus: boolean
   ) => {
-    dispatchToTasks(changeTaskStatusAC(todolistId, taskId, newStatus));
+    dispatchToTasks(
+      changeTaskStatusAC({ todolistId, taskId, status: newStatus })
+    );
   };
 
   const changeTaskTitle = (
@@ -76,26 +78,28 @@ function App() {
     taskId: string,
     newTitle: string
   ) => {
-    dispatchToTasks(changeTaskTitleAC(todolistId, taskId, newTitle));
+    dispatchToTasks(changeTaskTitleAC({ todolistId, taskId, title: newTitle }));
   };
 
   //todolist
 
   const changeFilter = (newFilter: FilterValuesType, todolistId: string) => {
-    dispatchToTodolists(changeFilterTodolistAC(newFilter, todolistId));
+    dispatchToTodolists(changeFilterTodolistAC({ newFilter, id: todolistId }));
   };
   const deleteTodolist = (todolistId: string) => {
-    dispatchToTodolists(deleteTodolistAC(todolistId));
-    delete tasks[todolistId];
+    const action = deleteTodolistAC(todolistId);
+    dispatchToTodolists(action);
+    dispatchToTasks(action);
   };
 
   const addTodolist = (title: string) => {
     const todolistId = v1();
-    dispatchToTodolists(addTodolistAC(title, todolistId));
-    dispatchToTasks(addTodolistAC(title, todolistId));
+    const action = addTodolistAC({ title: title, id: todolistId });
+    dispatchToTodolists(action);
+    dispatchToTasks(action);
   };
   const changeTodolistTitle = (todolistId: string, newTitle: string) => {
-    dispatchToTodolists(changeTodolistTitleAC(todolistId, newTitle));
+    dispatchToTodolists(changeTodolistTitleAC({ id: todolistId, newTitle }));
   };
   return (
     <div className="app">
