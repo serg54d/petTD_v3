@@ -1,6 +1,6 @@
-import { FilterValuesType, TodolistType } from "../AppWithReducers";
-
 // types
+
+import { FilterValuesType, TodolistType } from "../../app/AppWithRedux";
 
 export type DeleteTodolistActionType = ReturnType<typeof deleteTodolistAC>;
 export type AddTodolistActionType = ReturnType<typeof addTodolistAC>;
@@ -41,17 +41,18 @@ export const changeFilterTodolistAC = (payload: {
 
 // reducer
 
+const initialState: TodolistType[] = [];
+
 export const todolistsReducer = (
-  todolists: TodolistType[],
+  todolists: TodolistType[] = initialState,
   action: TodolistsReducerType
 ): TodolistType[] => {
-  const { id } = action.payload;
-
   switch (action.type) {
-    case "DELETE-TODOLIST":
-      return todolists.filter((todolist) => todolist.id !== id);
-    case "ADD-TODOLIST":
-      const { title } = action.payload;
+    case "DELETE-TODOLIST": {
+      return todolists.filter((todolist) => todolist.id !== action.payload.id);
+    }
+    case "ADD-TODOLIST": {
+      const { title, id } = action.payload;
 
       const newTodolist: TodolistType = {
         filter: "all",
@@ -59,7 +60,8 @@ export const todolistsReducer = (
         title,
       };
       return [...todolists, newTodolist];
-    case "CHANGE-TITLE":
+    }
+    case "CHANGE-TITLE": {
       const { newTitle } = action.payload;
 
       return todolists.map((todolist) =>
@@ -67,7 +69,8 @@ export const todolistsReducer = (
           ? { ...todolist, title: newTitle }
           : todolist
       );
-    case "CHANGE-FILTER":
+    }
+    case "CHANGE-FILTER": {
       const { newFilter } = action.payload;
 
       return todolists.map((todolist) =>
@@ -75,6 +78,7 @@ export const todolistsReducer = (
           ? { ...todolist, filter: newFilter }
           : todolist
       );
+    }
     default:
       return todolists;
   }

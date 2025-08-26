@@ -1,5 +1,4 @@
 import { beforeEach, expect, test } from "vitest";
-import type { TasksStateType } from "../AppWithReducers";
 import { addTodolistAC, deleteTodolistAC } from "./todolists-reducer";
 import { v1 } from "uuid";
 import {
@@ -9,6 +8,7 @@ import {
   removeTaskAC,
   tasksReducer,
 } from "./tasks-reducer";
+import { TasksStateType } from "../../app/AppWithRedux";
 
 let startState: TasksStateType = {};
 

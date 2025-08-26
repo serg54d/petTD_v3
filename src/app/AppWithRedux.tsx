@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import "./App.css";
 import { TaskType, Todolist } from "../features/todolist/Todolist";
 import { v1 } from "uuid";
@@ -25,8 +24,11 @@ import {
   changeTaskTitleAC,
   removeTaskAC,
 } from "../model/reducers/tasks-reducer";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "./store";
+
+import { useAppDispatch } from "../common/hooks/useAppDispatch";
+import { useAppSelector } from "../common/hooks/useAppSelector";
+import { RootState } from "./store";
+import { toogleModeAC } from "./app-reducer";
 
 export type FilterValuesType = "all" | "active" | "completed";
 export type TodolistType = {
@@ -38,25 +40,25 @@ export type TasksStateType = {
   [todolistId: string]: TaskType[];
 };
 
+export type ThemeMode = "dark" | "light";
+const selectTheme = (state: RootState): ThemeMode => state.app.theme;
+
 function App() {
-  const [isDark, setIsDark] = useState(false);
-  useEffect(() => {
-    document.body.classList.toggle("dark", isDark);
-  }, [isDark]);
+  const dispatch = useAppDispatch();
+
+  const todolists = useAppSelector((state) => state.todolists);
+  const tasks = useAppSelector((state) => state.tasks);
+  const themeMode = useAppSelector(selectTheme);
+
   const theme = createTheme({
     palette: {
-      mode: isDark ? "dark" : "light",
+      mode: themeMode,
     },
   });
 
-  const dispatch = useDispatch<AppDispatch>();
-  //   const [todolists, dispatchToTodolists] = useReducer(todolistsReducer, []);
-  //   const [tasks, dispatchToTasks] = useReducer(tasksReducer, {});
-
-  const todolists = useSelector<RootState, TodolistType[]>(
-    (state) => state.todolists
-  );
-  const tasks = useSelector<RootState, TasksStateType>((state) => state.tasks);
+  const handleThemeToggle = () => {
+    dispatch(toogleModeAC(themeMode));
+  };
 
   // tasks
 
@@ -122,8 +124,8 @@ function App() {
               </Typography>
               <Button color="inherit">Login</Button>
               <MaterialUISwitch
-                checked={isDark}
-                onChange={() => setIsDark(!isDark)}
+                checked={themeMode === "dark"}
+                onChange={handleThemeToggle}
               />
             </Toolbar>
           </AppBar>
@@ -136,11 +138,11 @@ function App() {
             let filteredTasks = tasks[todolist.id];
             if (todolist.filter === "active") {
               filteredTasks = filteredTasks.filter(
-                (task) => task.isDone === false
+                (task: TaskType) => task.isDone === false
               );
             } else if (todolist.filter === "completed") {
               filteredTasks = filteredTasks.filter(
-                (task) => task.isDone === true
+                (task: TaskType) => task.isDone === true
               );
             }
             return (

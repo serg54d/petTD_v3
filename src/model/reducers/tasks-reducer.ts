@@ -1,4 +1,4 @@
-import { TasksStateType } from "../AppWithReducers";
+import { TasksStateType } from "../../app/AppWithRedux";
 import { TaskType } from "../../features/todolist/Todolist";
 import {
   AddTodolistActionType,
@@ -67,15 +67,12 @@ export const changeTaskTitleAC = (payload: {
 
 // Reducer
 
+const initialState: TasksStateType = {};
+
 export const tasksReducer = (
-  tasks: TasksStateType,
+  tasks: TasksStateType = initialState,
   action: TasksReducerType
 ): TasksStateType => {
-  const payload = action.payload;
-  const hasTaskAndTodolist = "taskId" in payload && "todolistId" in payload;
-  const { taskId, todolistId } = hasTaskAndTodolist
-    ? payload
-    : { taskId: "", todolistId: "" };
   switch (action.type) {
     case "ADD-TODOLIST": {
       return { ...tasks, [action.payload.id]: [] };
@@ -86,35 +83,32 @@ export const tasksReducer = (
       delete newState[action.payload.id];
       return newState;
     }
-    case "REMOVE-TASK":
-      //   const { taskId, todolistId } = action.payload;
+    case "REMOVE-TASK": {
+      const { taskId, todolistId } = action.payload;
       return (tasks = {
         ...tasks,
         [todolistId]: tasks[todolistId].filter((task) => task.id !== taskId),
       });
-
-    case "ADD-TASK":
-      //   const { todolistId, text, taskId } = action.payload;
-      const { text } = action.payload;
+    }
+    case "ADD-TASK": {
+      const { todolistId, text, taskId } = action.payload;
       const newTask: TaskType = { isDone: false, text, id: taskId };
       return (tasks = {
         ...tasks,
         [todolistId]: [newTask, ...tasks[todolistId]],
       });
-
-    case "CHANGE-TASK-STATUS":
-      //   const { todolistId, taskId, status } = action.payload;
-      const { status } = action.payload;
+    }
+    case "CHANGE-TASK-STATUS": {
+      const { todolistId, taskId, status } = action.payload;
       return (tasks = {
         ...tasks,
         [todolistId]: tasks[todolistId].map((task) =>
           taskId === task.id ? { ...task, isDone: status } : task
         ),
       });
-
+    }
     case "CHANGE-TASK-TITLE": {
-      //   const { todolistId, taskId, title } = action.payload;
-      const { title } = action.payload;
+      const { todolistId, taskId, title } = action.payload;
       return (tasks = {
         ...tasks,
         [todolistId]: tasks[todolistId].map((task) =>
