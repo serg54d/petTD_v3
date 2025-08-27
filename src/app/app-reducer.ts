@@ -1,4 +1,5 @@
-import { ThemeMode } from "./AppWithRedux";
+import { ThemeMode } from "./AppHeader";
+
 
 type ToogleModeActionType = ReturnType<typeof toogleModeAC>;
 
