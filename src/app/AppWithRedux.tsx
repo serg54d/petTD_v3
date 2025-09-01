@@ -1,12 +1,13 @@
-import "./App.css";
-import { TaskType } from "../features/todolist/Todolist";
+import "@/app/App.css";
+
 
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 
-import { AppHeader } from "./AppHeader";
-import { AppMain } from "./AppMain";
-import { useAppSelector } from "../common/hooks/useAppSelector";
-import { selectTheme } from "../common/utils/app-selectors";
+import { AppHeader } from "@/app/AppHeader";
+import { AppMain } from "@/app/AppMain";
+import { useAppSelector } from "@/common/hooks/useAppSelector";
+import { selectTheme } from "@/common/utils/app-selectors";
+import { TaskType } from "@/features/Todolists/Todolist/Todolist";
 
 export type FilterValuesType = "all" | "active" | "completed";
 export type TodolistType = {

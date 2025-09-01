@@ -1,5 +1,5 @@
-import { TasksStateType } from "../../app/AppWithRedux";
-import { RootState } from "../../app/store";
+import { TasksStateType } from "@/app/AppWithRedux";
+import { RootState } from "@/app/store";
 
 // (state) => state.tasks;
 

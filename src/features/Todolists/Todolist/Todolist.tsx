@@ -1,17 +1,17 @@
-import { TodolistHeader } from "./TodolistHeader";
-import { FilterValuesType, TodolistType } from "../../app/AppWithRedux";
-import { EmptyList } from "../../common/components/EmptyList";
-import { AddItemForm } from "../../common/components/AddItemForm";
-import { FilterButtons } from "../../common/components/FilterButtons";
+import { FilterValuesType, TodolistType } from "@/app/AppWithRedux";
+import { useAppDispatch } from "@/common/hooks/useAppDispatch";
+import { addTask } from "@/features/Todolists/model/reducers/tasks-reducer";
 import {
-  changeFilterTodolistAC,
-  changeTodolistTitleAC,
-  deleteTodolistAC,
-} from "../../model/reducers/todolists-reducer";
-import { useAppDispatch } from "../../common/hooks/useAppDispatch";
-import { addTaskAC } from "../../model/reducers/tasks-reducer";
-import { v1 } from "uuid";
-import { Tasks } from "./tasks/Tasks";
+  changeTodolistFilter,
+  changeTodolistTitle,
+  deleteTodolist,
+} from "@/features/Todolists/model/reducers/todolists-reducer";
+import { nanoid } from "@reduxjs/toolkit";
+import { TodolistHeader } from "@/features/todolist/Todolist/TodolistHeader";
+import { AddItemForm } from "@/common/components/AddItemForm";
+import { EmptyList } from "@/common/components/EmptyList";
+import { Tasks } from "@/features/todolist/Todolist/Tasks/Tasks";
+import { FilterButtons } from "@/common/components/FilterButtons";
 
 export type TaskType = {
   id: string;
@@ -32,19 +32,20 @@ export const Todolist = (props: TodolistPropsType) => {
   const dispatch = useAppDispatch();
   const onClickAddTaskHandler = (title: string) => {
     dispatch(
-      addTaskAC({ todolistId: props.todolist.id, text: title, taskId: v1() })
+      addTask({ todolistId: props.todolist.id, text: title, taskId: nanoid() })
     );
   };
 
   const changeTodolistTitleHandler = (title: string) => {
-    dispatch(changeTodolistTitleAC({ id: props.todolist.id, newTitle: title }));
+    dispatch(changeTodolistTitle({ id: props.todolist.id, newTitle: title }));
   };
   const deleteTodolistHandler = () => {
-    dispatch(deleteTodolistAC(props.todolist.id));
+    let todolistId = props.todolist.id;
+    dispatch(deleteTodolist({ id: todolistId }));
   };
 
   const changeTodolistFilterHandler = (newFilter: FilterValuesType) => {
-    dispatch(changeFilterTodolistAC({ newFilter, id: props.todolist.id }));
+    dispatch(changeTodolistFilter({ newFilter, id: props.todolist.id }));
   };
 
   return (

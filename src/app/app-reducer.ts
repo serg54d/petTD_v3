@@ -1,4 +1,4 @@
-import { ThemeMode } from "./AppHeader";
+import { ThemeMode } from "@/app/AppHeader";
 
 
 type ToogleModeActionType = ReturnType<typeof toogleModeAC>;

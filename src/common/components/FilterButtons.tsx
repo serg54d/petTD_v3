@@ -1,5 +1,5 @@
-import { CustomButton } from "./Button";
-import { FilterValuesType } from "../../app/AppWithRedux";
+import { CustomButton } from "@/common/components/Button";
+import { FilterValuesType } from "@/app/AppWithRedux";
 
 type FilterButtonsProps = {
   filter: FilterValuesType;

@@ -1,20 +1,22 @@
-import { v1 } from "uuid";
-import { AddItemForm } from "../common/components/AddItemForm";
-import { useAppDispatch } from "../common/hooks/useAppDispatch";
-import { addTodolistAC } from "../model/reducers/todolists-reducer";
-import { Todolists } from "../features/todolist/Todolists";
+import { AddItemForm } from "@/common/components/AddItemForm";
+import { useAppDispatch } from "@/common/hooks/useAppDispatch";
+import { addTodolist } from "@/features/Todolists/model/reducers/todolists-reducer";
+import { Todolists } from "@/features/Todolists/Todolists";
+import { nanoid } from "@reduxjs/toolkit";
 
 export const AppMain = () => {
   const dispatch = useAppDispatch();
-  const addTodolist = (title: string) => {
-    const todolistId = v1();
-    const action = addTodolistAC({ title: title, id: todolistId });
-    dispatch(action);
+
+  const addTodolistHandler = (title: string) => {
+    const todolistId = nanoid();
+    console.log(todolistId);
+    dispatch(addTodolist({ title, id: todolistId }));
   };
+
   return (
     <>
       <div className="app_add-todolist">
-        <AddItemForm addItem={addTodolist} />
+        <AddItemForm addItem={addTodolistHandler} />
       </div>
       <Todolists />
     </>

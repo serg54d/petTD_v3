@@ -1,9 +1,15 @@
 import List from "@mui/material/List";
-import { TaskItem } from "./TaskItem";
-import { TaskType } from "../Todolist";
-import { useAppDispatch } from "../../../common/hooks/useAppDispatch";
-import { changeTaskStatusAC, changeTaskTitleAC, removeTaskAC } from "../../../model/reducers/tasks-reducer";
-import { TodolistType } from "../../../app/AppWithRedux";
+
+import {
+  changeTaskStatus,
+  changeTaskTitle,
+  removeTask,
+} from "../../model/reducers/tasks-reducer";
+
+import { TaskType } from "@/features/todolist/Todolist/Todolist";
+import { TodolistType } from "@/app/AppWithRedux";
+import { useAppDispatch } from "@/common/hooks/useAppDispatch";
+import { TaskItem } from "@/features/todolist/Todolist/Tasks/TaskItem";
 
 type TasksPropsType = {
   tasks: TaskType[];
@@ -14,16 +20,14 @@ export const Tasks = (props: TasksPropsType) => {
   const dispatch = useAppDispatch();
   const changeTaskStatusHandler = (taskId: string, status: boolean) => {
     dispatch(
-      changeTaskStatusAC({ todolistId: props.todolist.id, taskId, status })
+      changeTaskStatus({ todolistId: props.todolist.id, taskId, status })
     );
   };
   const changeTaskTitleHandler = (taskId: string, title: string) => {
-    dispatch(
-      changeTaskTitleAC({ todolistId: props.todolist.id, taskId, title })
-    );
+    dispatch(changeTaskTitle({ todolistId: props.todolist.id, taskId, title }));
   };
   const removeTaskHandler = (taskId: string) => {
-    dispatch(removeTaskAC({ todolistId: props.todolist.id, taskId }));
+    dispatch(removeTask({ todolistId: props.todolist.id, taskId }));
   };
   return (
     <List className="tasks-container">

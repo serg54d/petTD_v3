@@ -4,12 +4,12 @@ import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { MaterialUISwitch } from "../common/components/SwitchTheme";
+import { MaterialUISwitch } from "@/common/components/SwitchTheme";
 import MenuIcon from "@mui/icons-material/Menu";
-import { useAppSelector } from "../common/hooks/useAppSelector";
-import { useAppDispatch } from "../common/hooks/useAppDispatch";
-import { toogleModeAC } from "./app-reducer";
-import { selectTheme } from "../common/utils/app-selectors";
+import { useAppSelector } from "@/common/hooks/useAppSelector";
+import { useAppDispatch } from "@/common/hooks/useAppDispatch";
+import { toogleModeAC } from "@/app/app-reducer";
+import { selectTheme } from "@/common/utils/app-selectors";
 
 export type ThemeMode = "dark" | "light";
 

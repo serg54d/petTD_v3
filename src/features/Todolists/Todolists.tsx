@@ -1,10 +1,9 @@
-import { useAppSelector } from "../../common/hooks/useAppSelector";
-import { selectTasks } from "../../common/utils/tasks-selector";
-import { TaskType, Todolist } from "./Todolist";
-import { selectTodolists } from "../../common/utils/todolists-selector";
+import { useAppSelector } from "@/common/hooks/useAppSelector";
+import { selectTasks } from "@/common/utils/tasks-selector";
+import { selectTodolists } from "@/common/utils/todolists-selector";
+import { TaskType, Todolist } from "@/features/Todolists/Todolist/Todolist";
 
 export const Todolists = () => {
-  //   const dispatch = useAppDispatch();
   const todolists = useAppSelector(selectTodolists);
   const tasks = useAppSelector(selectTasks);
 

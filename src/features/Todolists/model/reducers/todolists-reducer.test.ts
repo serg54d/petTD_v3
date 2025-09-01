@@ -7,15 +7,16 @@ import {
   deleteTodolistAC,
   todolistsReducer,
 } from "./todolists-reducer";
-import { TodolistType } from "../../app/AppWithRedux";
+import { TodolistType } from "../../../../app/AppWithRedux";
+import { nanoid } from "@reduxjs/toolkit";
 
 let todolistId1: string;
 let todolistId2: string;
 let startState: TodolistType[];
 
 beforeEach(() => {
-  todolistId1 = v1();
-  todolistId2 = v1();
+  todolistId1 = nanoid();
+  todolistId2 = nanoid();
 
   // 1. Стартовый state
   startState = [
@@ -35,7 +36,7 @@ test("correct todolist should be created", () => {
   const title = "New todolist";
   const endState = todolistsReducer(
     startState,
-    addTodolistAC({ title, id: v1() })
+    addTodolistAC({ title, id: nanoid() })
   );
 
   expect(endState.length).toBe(3);

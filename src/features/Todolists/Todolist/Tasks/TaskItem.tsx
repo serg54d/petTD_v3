@@ -4,8 +4,9 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 import { ListItem } from "@mui/material";
+
+import { EditableSpan } from "@/common/components/EditableSpan";
 import { getListItemSx } from "../TodolistItem.styles";
-import { EditableSpan } from "../../../common/components/EditableSpan";
 
 type TaskItemProps = {
   task: {

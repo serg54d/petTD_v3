@@ -8,7 +8,8 @@ import {
   removeTaskAC,
   tasksReducer,
 } from "./tasks-reducer";
-import { TasksStateType } from "../../app/AppWithRedux";
+import { TasksStateType } from "../../../../app/AppWithRedux";
+import { nanoid } from "@reduxjs/toolkit";
 
 let startState: TasksStateType = {};
 
@@ -30,7 +31,7 @@ beforeEach(() => {
 test("array should be created for new todolist", () => {
   const endState = tasksReducer(
     startState,
-    addTodolistAC({ title: "New todolist", id: v1() })
+    addTodolistAC({ title: "New todolist", id: nanoid() })
   );
 
   const keys = Object.keys(endState);
@@ -76,7 +77,7 @@ test("correct task should be deleted", () => {
 test("correct task should be created at correct array", () => {
   const endState = tasksReducer(
     startState,
-    addTaskAC({ todolistId: "todolistId2", text: "juice", taskId: v1() })
+    addTaskAC({ todolistId: "todolistId2", text: "juice", taskId: nanoid() })
   );
 
   expect(endState.todolistId1.length).toBe(3);
