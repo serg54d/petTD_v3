@@ -5,16 +5,17 @@ import DeleteIcon from "@mui/icons-material/Delete";
 
 import { ListItem } from "@mui/material";
 
-import { EditableSpan } from "@/common/components/EditableSpan";
+import { EditableSpan } from "@/common/components";
 import { getListItemSx } from "../TodolistItem.styles";
+import { TaskStatus } from "@/features/Todolists/lib/enums";
 
 type TaskItemProps = {
   task: {
     id: string;
-    isDone: boolean;
+    isDone: TaskStatus;
     text: string;
   };
-  onChangeStatus: (taskId: string, newStatus: boolean) => void;
+  onChangeStatus: (taskId: string, newStatus: TaskStatus) => void;
   onChangeTitle: (taskId: string, newTitle: string) => void;
   onRemove: (taskId: string) => void;
 };
@@ -26,7 +27,10 @@ export const TaskItem = ({
   onRemove,
 }: TaskItemProps) => {
   const changeTaskStatusHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    onChangeStatus(task.id, e.currentTarget.checked);
+    const status = e.currentTarget.checked
+      ? TaskStatus.Completed
+      : TaskStatus.Active;
+    onChangeStatus(task.id, status);
   };
 
   const changeTaskTitleHandler = (newTitle: string) => {
@@ -36,10 +40,10 @@ export const TaskItem = ({
   const removeTaskHandler = () => {
     onRemove(task.id);
   };
-
+  const isChecked = task.isDone === TaskStatus.Completed;
   return (
-    <ListItem key={task.id} sx={getListItemSx(task.isDone)}>
-      <Checkbox checked={task.isDone} onChange={changeTaskStatusHandler} />
+    <ListItem key={task.id} sx={getListItemSx(isChecked)}>
+      <Checkbox checked={isChecked} onChange={changeTaskStatusHandler} />
       <EditableSpan
         className="task-text"
         title={task.text}

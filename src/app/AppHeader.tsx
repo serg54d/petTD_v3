@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { MaterialUISwitch } from "@/common/components/SwitchTheme";
+import { MaterialUISwitch } from "@/common/components";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useAppSelector } from "@/common/hooks/useAppSelector";
 import { useAppDispatch } from "@/common/hooks/useAppDispatch";

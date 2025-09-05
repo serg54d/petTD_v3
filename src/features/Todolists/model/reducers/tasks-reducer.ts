@@ -1,27 +1,28 @@
 import { createAction, createReducer } from "@reduxjs/toolkit";
 import { TasksStateType } from "@/app/AppWithRedux";
-import { TaskType } from "@/features/Todolists/Todolist/Todolist";
+import { TaskType } from "@/features/Todolists/ui/Todolist/Todolist";
 import {
   addTodolist,
-  AddTodolistActionType,
+  //   AddTodolistActionType,
   deleteTodolist,
-  DeleteTodolistActionType,
+  //   DeleteTodolistActionType,
 } from "@/features/Todolists/model/reducers/todolists-reducer";
+import { TaskStatus } from "../../lib/enums";
 
 // types
 
-type RemoveTaskActionType = ReturnType<typeof removeTask>;
-type AddTaskActionType = ReturnType<typeof addTask>;
-type ChangeTaskStatusActionType = ReturnType<typeof changeTaskStatus>;
-type ChangeTaskTitleActionType = ReturnType<typeof changeTaskTitle>;
+// type RemoveTaskActionType = ReturnType<typeof removeTask>;
+// type AddTaskActionType = ReturnType<typeof addTask>;
+// type ChangeTaskStatusActionType = ReturnType<typeof changeTaskStatus>;
+// type ChangeTaskTitleActionType = ReturnType<typeof changeTaskTitle>;
 
-type TasksReducerType =
-  | AddTodolistActionType
-  | DeleteTodolistActionType
-  | RemoveTaskActionType
-  | AddTaskActionType
-  | ChangeTaskStatusActionType
-  | ChangeTaskTitleActionType;
+// type TasksReducerType =
+//   | AddTodolistActionType
+//   | DeleteTodolistActionType
+//   | RemoveTaskActionType
+//   | AddTaskActionType
+//   | ChangeTaskStatusActionType
+//   | ChangeTaskTitleActionType;
 
 // AC
 
@@ -33,12 +34,13 @@ export const addTask = createAction<{
   todolistId: string;
   text: string;
   taskId: string;
+  status: TaskStatus
 }>("tasks/addTask");
 
 export const changeTaskStatus = createAction<{
   todolistId: string;
   taskId: string;
-  status: boolean;
+  status: TaskStatus;
 }>("tasks/changeTaskStatus");
 
 export const changeTaskTitle = createAction<{
@@ -60,7 +62,7 @@ export const tasksReducer = createReducer(initialState, (builder) => {
 
   builder.addCase(addTask, (state, action) => {
     const { taskId, todolistId, text } = action.payload;
-    const newTask: TaskType = { id: taskId, isDone: false, text };
+    const newTask: TaskType = { id: taskId, isDone: TaskStatus.Active, text };
     state[todolistId].unshift(newTask);
   });
 

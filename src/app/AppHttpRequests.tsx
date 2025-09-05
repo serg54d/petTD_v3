@@ -1,7 +1,5 @@
 import "@/app/App.css";
-
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
-
 import { AppHeader } from "@/app/AppHeader";
 import { AppMain } from "@/app/AppMain";
 import { useAppSelector } from "@/common/hooks/useAppSelector";
@@ -9,7 +7,6 @@ import { selectTheme } from "@/common/utils/app-selectors";
 import { TaskType } from "@/features/Todolists/ui/Todolist/Todolist";
 import { FilterValues } from "@/common/enums/enums";
 
-export type FilterValuesType = "all" | "active" | "completed";
 export type TodolistType = {
   id: string;
   title: string;
@@ -19,15 +16,13 @@ export type TasksStateType = {
   [todolistId: string]: TaskType[];
 };
 
-function App() {
+function AppHttpRequests() {
   const themeMode = useAppSelector(selectTheme);
   const theme = createTheme({
     palette: {
       mode: themeMode,
     },
   });
-
-  //todolist
 
   return (
     <div className="app">
@@ -40,4 +35,4 @@ function App() {
   );
 }
 
-export default App;
+export default AppHttpRequests;

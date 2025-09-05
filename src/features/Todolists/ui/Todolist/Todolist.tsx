@@ -7,15 +7,18 @@ import {
   deleteTodolist,
 } from "@/features/Todolists/model/reducers/todolists-reducer";
 import { nanoid } from "@reduxjs/toolkit";
-import { TodolistHeader } from "@/features/todolist/Todolist/TodolistHeader";
 import { AddItemForm } from "@/common/components/AddItemForm";
-import { EmptyList } from "@/common/components/EmptyList";
-import { Tasks } from "@/features/todolist/Todolist/Tasks/Tasks";
+import { EmptyList } from "@/common/components";
 import { FilterButtons } from "@/common/components/FilterButtons";
+import { TodolistHeader } from "./TodolistHeader";
+import { Tasks } from "@/features/Todolists/ui/Todolist/Tasks/Tasks";
+import { tasksApi } from "../../api/requests/tasksApi";
+import { todolistsApi } from "../../api/requests/todolistsApi";
+import { TaskStatus } from "../../lib/enums";
 
 export type TaskType = {
   id: string;
-  isDone: boolean;
+  isDone: TaskStatus;
   text: string;
 };
 
@@ -30,18 +33,48 @@ export type TodolistPropsType = {
 
 export const Todolist = (props: TodolistPropsType) => {
   const dispatch = useAppDispatch();
-  const onClickAddTaskHandler = (title: string) => {
-    dispatch(
-      addTask({ todolistId: props.todolist.id, text: title, taskId: nanoid() })
-    );
+  const createTaskHandler = async (title: string) => {
+    const response = await tasksApi.createTask(props.todolist.id, title);
+    try {
+      if (response.data.resultCode === 0) {
+        dispatch(
+          addTask({
+            todolistId: props.todolist.id,
+            text: title,
+            taskId: nanoid(),
+            status: TaskStatus.Active,
+          })
+        );
+      }
+    } catch (error) {
+      console.error("Failed to create task:", error);
+    }
   };
 
-  const changeTodolistTitleHandler = (title: string) => {
-    dispatch(changeTodolistTitle({ id: props.todolist.id, newTitle: title }));
+  const changeTodolistTitleHandler = async (title: string) => {
+    const response = await todolistsApi.changeTodolistTitle(
+      title,
+      props.todolist.id
+    );
+    try {
+      if (response.data.resultCode === 0) {
+        dispatch(
+          changeTodolistTitle({ id: props.todolist.id, newTitle: title })
+        );
+      }
+    } catch (error) {
+      console.error("Failed to change title for todolist:", error);
+    }
   };
-  const deleteTodolistHandler = () => {
-    let todolistId = props.todolist.id;
-    dispatch(deleteTodolist({ id: todolistId }));
+  const deleteTodolistHandler = async () => {
+    const response = await todolistsApi.removeTodolist(props.todolist.id);
+    try {
+      if (response.data.resultCode === 0) {
+        dispatch(deleteTodolist({ id: props.todolist.id }));
+      }
+    } catch (error) {
+      console.error("Failed to delete todolist:", error);
+    }
   };
 
   const changeTodolistFilterHandler = (newFilter: FilterValuesType) => {
@@ -56,7 +89,7 @@ export const Todolist = (props: TodolistPropsType) => {
         onDelete={deleteTodolistHandler}
       />
 
-      <AddItemForm addItem={onClickAddTaskHandler} />
+      <AddItemForm addItem={createTaskHandler} />
 
       {props.tasks.length === 0 ? (
         <EmptyList />
