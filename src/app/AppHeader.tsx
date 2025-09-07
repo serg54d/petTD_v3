@@ -8,17 +8,16 @@ import { MaterialUISwitch } from "@/common/components";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useAppSelector } from "@/common/hooks/useAppSelector";
 import { useAppDispatch } from "@/common/hooks/useAppDispatch";
-import { toogleModeAC } from "@/app/app-reducer";
+import { changeThemeModeAC } from "@/app/app-slice";
 import { selectTheme } from "@/common/utils/app-selectors";
 
 export type ThemeMode = "dark" | "light";
 
-// export const selectTheme = (state: RootState): ThemeMode => state.app.theme;
 export const AppHeader = () => {
   const dispatch = useAppDispatch();
   const themeMode = useAppSelector(selectTheme);
   const handleThemeToggle = () => {
-    dispatch(toogleModeAC(themeMode));
+    dispatch(changeThemeModeAC({ themeMode }));
   };
   return (
     <Box sx={{ flexGrow: 1 }}>

@@ -1,4 +1,4 @@
-import { TodolistType } from "@/app/AppWithRedux";
+import { TodolistType } from "@/app/App";
 import { RootState } from "@/app/store";
 
 export const selectTodolists = (state: RootState): TodolistType[] =>

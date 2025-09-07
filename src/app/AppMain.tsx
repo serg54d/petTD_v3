@@ -2,7 +2,7 @@
 import { AddItemForm } from "@/common/components";
 import { useAppDispatch } from "@/common/hooks/useAppDispatch";
 import { todolistsApi } from "@/features/Todolists/api/requests/todolistsApi";
-import { addTodolist } from "@/features/Todolists/model/reducers/todolists-reducer";
+import { addTodolist } from "@/features/Todolists/model/reducers/todolists-slice";
 
 import { Todolists } from "@/features/Todolists/Todolists";
 

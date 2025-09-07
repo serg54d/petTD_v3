@@ -1,4 +1,4 @@
-import { TasksStateType } from "@/app/AppWithRedux";
+import { TasksStateType } from "@/app/App";
 import { RootState } from "@/app/store";
 
 // (state) => state.tasks;

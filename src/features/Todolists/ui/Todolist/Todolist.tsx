@@ -1,11 +1,6 @@
-import { FilterValuesType, TodolistType } from "@/app/AppWithRedux";
+import { TodolistType } from "@/app/App";
 import { useAppDispatch } from "@/common/hooks/useAppDispatch";
-import { addTask } from "@/features/Todolists/model/reducers/tasks-reducer";
-import {
-  changeTodolistFilter,
-  changeTodolistTitle,
-  deleteTodolist,
-} from "@/features/Todolists/model/reducers/todolists-reducer";
+import { addTask } from "@/features/Todolists/model/reducers/tasks-slice";
 import { nanoid } from "@reduxjs/toolkit";
 import { AddItemForm } from "@/common/components/AddItemForm";
 import { EmptyList } from "@/common/components";
@@ -15,6 +10,12 @@ import { Tasks } from "@/features/Todolists/ui/Todolist/Tasks/Tasks";
 import { tasksApi } from "../../api/requests/tasksApi";
 import { todolistsApi } from "../../api/requests/todolistsApi";
 import { TaskStatus } from "../../lib/enums";
+import { FilterValues } from "@/common/enums/enums";
+import {
+  changeTodolistFilter,
+  changeTodolistTitle,
+  deleteTodolist,
+} from "../../model/reducers/todolists-slice";
 
 export type TaskType = {
   id: string;
@@ -24,11 +25,7 @@ export type TaskType = {
 
 export type TodolistPropsType = {
   todolist: TodolistType;
-
   tasks: Array<TaskType>;
-  //   removeTask: (taskId: string, todolistId: string) => void;
-  //   changeFilter: (newFilter: FilterValuesType, todolistId: string) => void;
-  //   addTask: (title: string, todolistId: string) => void;
 };
 
 export const Todolist = (props: TodolistPropsType) => {
@@ -77,7 +74,7 @@ export const Todolist = (props: TodolistPropsType) => {
     }
   };
 
-  const changeTodolistFilterHandler = (newFilter: FilterValuesType) => {
+  const changeTodolistFilterHandler = (newFilter: FilterValues) => {
     dispatch(changeTodolistFilter({ newFilter, id: props.todolist.id }));
   };
 

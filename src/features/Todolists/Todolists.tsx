@@ -2,14 +2,17 @@ import { useAppSelector } from "@/common/hooks/useAppSelector";
 import { selectTasks } from "@/common/utils/tasks-selector";
 import { selectTodolists } from "@/common/utils/todolists-selector";
 import { TaskType, Todolist } from "@/features/Todolists/ui/Todolist/Todolist";
-import axios from "axios";
-import { useEffect, useState } from "react";
+
+import { useEffect } from "react";
 import { todolistsApi } from "./api/requests/todolistsApi";
-import { TodolistType } from "@/app/AppWithRedux";
+
 import { tasksApi } from "./api/requests/tasksApi";
 import { useAppDispatch } from "@/common/hooks/useAppDispatch";
-import { addTask } from "./model/reducers/tasks-reducer";
-import { addTodolist } from "./model/reducers/todolists-reducer";
+import { addTask, setTasks } from "./model/reducers/tasks-slice";
+import {
+  addTodolist,
+  fetchTodolistsTC,
+} from "./model/reducers/todolists-slice";
 import { TaskStatus } from "./lib/enums";
 // import { getTasks } from "./model/requests";
 
@@ -28,58 +31,46 @@ export const Todolists = () => {
   const tasks = useAppSelector(selectTasks);
 
   useEffect(() => {
-    todolistsApi
-      .getTodolists()
-      .then((res) => {
-        const todolistsData = res.data;
+    const loadData = async () => {
+      try {
+        // Используем thunk для загрузки тудулистов
+        const todolistsResult = await dispatch(fetchTodolistsTC()).unwrap();
 
-        // Добавляем тудулисты в стейт
-        todolistsData.forEach((todolist) => {
-          dispatch(addTodolist({ title: todolist.title, id: todolist.id }));
-        });
+        if (todolistsResult?.todolists) {
+          const todolistsData = todolistsResult.todolists;
 
-        return todolistsData;
-      })
-      .then((todolistsData) => {
-        // Загружаем задачи для каждого тудулиста
-        todolistsData.forEach((todolist) => {
-          tasksApi
-            .getTasks(todolist.id)
-            .then((res) => {
-              const tasksData = res.data.items;
+          // Загружаем задачи для всех тудулистов
+          const tasksPromises = todolistsData.map((todolist) =>
+            tasksApi.getTasks(todolist.id).then((res) => ({
+              todolistId: todolist.id,
+              tasks: res.data.items,
+            }))
+          );
 
-              // Добавляем каждую задачу в стейт
-              tasksData.forEach((task: any) => {
-                dispatch(
-                  addTask({
-                    todolistId: todolist.id,
-                    taskId: task.id,
-                    text: task.title,
-                    status:
-                      task.status === 1
-                        ? TaskStatus.Completed
-                        : TaskStatus.Active,
-                  })
-                );
-              });
-            })
-            .catch((error) => {
-              console.error(
-                `Failed to load tasks for todolist ${todolist.id}:`,
-                error
-              );
-            });
-        });
-      })
-      .catch((error) => {
-        console.error("Failed to load todolists:", error);
-      });
+          const tasksResults = await Promise.all(tasksPromises);
+
+          // Собираем все задачи в один массив
+          const allTasks = tasksResults.flatMap((result) =>
+            result.tasks.map((task) => ({
+              ...task,
+              todoListId: result.todolistId,
+            }))
+          );
+
+          // Диспатчим все задачи одним действием
+          dispatch(setTasks({ tasks: allTasks }));
+        }
+      } catch (error) {
+        console.error("Failed to load data:", error);
+      }
+    };
+
+    loadData();
   }, [dispatch]);
-
   return (
     <div className="todolists-container">
       {todolists.map((todolist) => {
-        let filteredTasks = tasks[todolist.id];
+        let filteredTasks = tasks[todolist.id] || [];
         if (todolist.filter === "active") {
           filteredTasks = filteredTasks.filter(
             (task: TaskType) => task.isDone === TaskStatus.Active

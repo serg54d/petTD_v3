@@ -4,10 +4,10 @@ import {
   changeTaskStatus,
   changeTaskTitle,
   removeTask,
-} from "../../../model/reducers/tasks-reducer";
+} from "../../../model/reducers/tasks-slice";
 
 import { TaskType } from "@/features/Todolists/ui/Todolist/Todolist";
-import { TodolistType } from "@/app/AppWithRedux";
+import { TodolistType } from "@/app/App";
 import { useAppDispatch } from "@/common/hooks/useAppDispatch";
 import { TaskItem } from "@/features/Todolists/ui/Todolist/Tasks/TaskItem";
 import {

@@ -1,10 +1,10 @@
 import { CustomButton } from "@/common/components";
-import { FilterValuesType } from "@/app/AppWithRedux";
+
 import { FilterValues } from "../enums/enums";
 
 type FilterButtonsProps = {
   filter: FilterValues;
-  onChangeFilter: (newFilter: FilterValuesType) => void;
+  onChangeFilter: (newFilter: FilterValues) => void;
 };
 
 export const FilterButtons = ({
@@ -16,21 +16,21 @@ export const FilterButtons = ({
       <CustomButton
         variant={filter === FilterValues.All ? "contained" : "outlined"}
         size="small"
-        onClick={() => onChangeFilter("all")}
+        onClick={() => onChangeFilter(FilterValues.All)}
       >
         All
       </CustomButton>
       <CustomButton
         variant={filter === FilterValues.Active ? "contained" : "outlined"}
         size="small"
-        onClick={() => onChangeFilter("active")}
+        onClick={() => onChangeFilter(FilterValues.Active)}
       >
         Active
       </CustomButton>
       <CustomButton
         variant={filter === FilterValues.Completed ? "contained" : "outlined"}
         size="small"
-        onClick={() => onChangeFilter("completed")}
+        onClick={() => onChangeFilter(FilterValues.Completed)}
       >
         Completed
       </CustomButton>

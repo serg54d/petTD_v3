@@ -1,4 +1,4 @@
-export type TaskType = {
+export type DomainTaskType = {
   description: string | null;
   title: string;
   completed: boolean | null;
