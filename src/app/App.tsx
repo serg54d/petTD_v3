@@ -3,9 +3,10 @@ import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import { AppHeader } from "@/app/AppHeader";
 import { AppMain } from "@/app/AppMain";
 import { useAppSelector } from "@/common/hooks/useAppSelector";
-import { selectTheme } from "@/common/utils/app-selectors";
+
 import { TaskType } from "@/features/Todolists/ui/Todolist/Todolist";
 import { FilterValues } from "@/common/enums/enums";
+import { selectTheme } from "./app-slice";
 
 export type TodolistType = {
   id: string;
@@ -19,11 +20,21 @@ export type TasksStateType = {
   [todolistId: string]: TaskType[];
 };
 
-function AppHttpRequests() {
+function App() {
   const themeMode = useAppSelector(selectTheme);
   const theme = createTheme({
     palette: {
-      mode: themeMode,
+      mode: themeMode, // 'light' или 'dark'
+      primary: {
+        main: themeMode === "dark" ? "#6d9ee6" : "#4a6fa5",
+      },
+      secondary: {
+        main: themeMode === "dark" ? "#4a8bb8" : "#166088",
+      },
+      background: {
+        default: themeMode === "dark" ? "#121212" : "#f5f7fa",
+        paper: themeMode === "dark" ? "#1e1e1e" : "#ffffff",
+      },
     },
   });
 
@@ -38,4 +49,4 @@ function AppHttpRequests() {
   );
 }
 
-export default AppHttpRequests;
+export default App;

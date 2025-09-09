@@ -1,9 +1,9 @@
 import List from "@mui/material/List";
 
 import {
-  changeTaskStatus,
-  changeTaskTitle,
-  removeTask,
+  changeTaskStatusTC,
+  changeTaskTitleTC,
+  removeTaskTC,
 } from "../../../model/reducers/tasks-slice";
 
 import { TaskType } from "@/features/Todolists/ui/Todolist/Todolist";
@@ -46,49 +46,20 @@ export const Tasks = (props: TasksPropsType) => {
     try {
       if (response.data.resultCode === 0) {
         dispatch(
-          changeTaskStatus({ todolistId: props.todolist.id, taskId, status })
+          changeTaskStatusTC({ todolistId: props.todolist.id, taskId, status })
         );
       }
     } catch (error) {
       console.error("Failed to change status for task:", error);
     }
   };
-  const changeTaskTitleHandler = async (taskId: string, title: string) => {
-    const task = props.tasks.find((t) => t.id === taskId);
-    if (!task) return;
-    const model: ModelUpdateType = {
-      completed: null,
-      deadline: null,
-      description: null,
-      priority: 0,
-      startDate: null,
-      status: task.isDone,
-      title,
-    };
-    const response = await tasksApi.updateTask(
-      model,
-      props.todolist.id,
-      taskId
+  const changeTaskTitleHandler = (taskId: string, title: string) => {
+    dispatch(
+      changeTaskTitleTC({ todolistId: props.todolist.id, taskId, title })
     );
-    try {
-      if (response.data.resultCode === 0) {
-        dispatch(
-          changeTaskTitle({ todolistId: props.todolist.id, taskId, title })
-        );
-      }
-    } catch (error) {
-      console.error("Failed to change title for task:", error);
-    }
   };
-  const removeTaskHandler = async (taskId: string) => {
-    const response = await tasksApi.deleteTask(props.todolist.id, taskId);
-    try {
-      if (response.data.resultCode === 0) {
-        dispatch(removeTask({ todolistId: props.todolist.id, taskId }));
-      }
-    } catch (error) {
-      console.error("Failed to delete task:", error);
-    }
+  const removeTaskHandler = (taskId: string) => {
+    dispatch(removeTaskTC({ todolistId: props.todolist.id, taskId }));
   };
   return (
     <List className="tasks-container">

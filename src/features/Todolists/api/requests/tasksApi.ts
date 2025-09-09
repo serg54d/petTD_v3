@@ -1,5 +1,6 @@
 import { instance } from "@/common/instance/instance";
-import { BaseTaskResponse, TaskType } from "../types/tasksApi.types";
+// import { TaskType } from "../../ui/Todolist/Todolist";
+import { BaseTaskResponse, DomainTaskType } from "../types/tasksApi.types";
 
 export type ModelUpdateType = {
   title: string;
@@ -13,12 +14,12 @@ export type ModelUpdateType = {
 
 export const tasksApi = {
   getTasks: (todolistId: string) => {
-    return instance.get<{ items: TaskType[] }>(
+    return instance.get<{ items: DomainTaskType[] }>(
       `/todo-lists/${todolistId}/tasks`
     );
   },
   createTask: (todolistId: string, title: string) => {
-    return instance.post<BaseTaskResponse<{ item: TaskType }>>(
+    return instance.post<BaseTaskResponse<{ item: DomainTaskType }>>(
       `/todo-lists/${todolistId}/tasks`,
       {
         title,
@@ -26,7 +27,7 @@ export const tasksApi = {
     );
   },
   updateTask: (model: ModelUpdateType, todolistId: string, taskId: string) => {
-    return instance.put<BaseTaskResponse<{ item: TaskType }>>(
+    return instance.put<BaseTaskResponse<{ item: DomainTaskType }>>(
       `/todo-lists/${todolistId}/tasks/${taskId}`,
       model
     );

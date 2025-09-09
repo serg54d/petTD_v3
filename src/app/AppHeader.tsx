@@ -8,8 +8,7 @@ import { MaterialUISwitch } from "@/common/components";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useAppSelector } from "@/common/hooks/useAppSelector";
 import { useAppDispatch } from "@/common/hooks/useAppDispatch";
-import { changeThemeModeAC } from "@/app/app-slice";
-import { selectTheme } from "@/common/utils/app-selectors";
+import { changeThemeModeAC, selectTheme } from "@/app/app-slice";
 
 export type ThemeMode = "dark" | "light";
 

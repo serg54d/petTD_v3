@@ -15,7 +15,7 @@ export const todolistsApi = {
     return instance.delete<BaseResponse>(`/todo-lists/${todolistId}`);
   },
   changeTodolistTitle: (title: string, todolistId: string) => {
-    return instance.put(`/todo-lists/${todolistId}`, { title });
+    return instance.put<BaseResponse>(`/todo-lists/${todolistId}`, { title });
   },
   
 };
