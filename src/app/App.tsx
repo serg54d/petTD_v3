@@ -9,6 +9,7 @@ import { FilterValues } from "@/common/enums/enums";
 import { selectTheme } from "./app-slice";
 import { useEffect } from "react";
 import { RequestStatus } from "@/common/types/types";
+import Toast from "@/common/components/Toast/Toast";
 
 export type TodolistType = {
   id: string;
@@ -55,6 +56,7 @@ function App() {
         <CssBaseline />
         <AppHeader />
         <AppMain />
+        <Toast />
       </ThemeProvider>
     </div>
   );

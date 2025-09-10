@@ -8,6 +8,14 @@ import { RootState } from "@/app/store";
 import { getLoadingStatus } from "@/app/app-slice";
 import { RequestStatus } from "@/common/types/types";
 
+import {
+  handleResultError,
+  handleHttpError,
+  showInfoToast,
+  showSuccessToast,
+} from "@/common/utils/apiResponseHandlers";
+import { Todolists } from "../../Todolists";
+
 export const selectTodolists = (state: RootState): TodolistType[] =>
   state.todolists;
 
@@ -21,14 +29,16 @@ export const todolistsSlice = createSlice({
       .addCase(fetchTodolistsTC.fulfilled, (state, action) => {
         const todolists = action.payload?.todolists;
         if (todolists) {
-          const transformedTodolists = todolists.map((todolist) => ({
-            id: todolist.id,
-            title: todolist.title,
-            filter: FilterValues.All,
-            addedDate: todolist.addedDate,
-            order: todolist.order,
-            entityStatus: "idle" as RequestStatus,
-          }));
+          const transformedTodolists = (todolists as Todolists).map(
+            (todolist) => ({
+              id: todolist.id,
+              title: todolist.title,
+              filter: FilterValues.All,
+              addedDate: todolist.addedDate,
+              order: todolist.order,
+              entityStatus: "idle" as RequestStatus,
+            })
+          );
           state.push(...transformedTodolists);
         }
       })
@@ -103,13 +113,22 @@ export const fetchTodolistsTC = createAsyncThunk(
   `${todolistsSlice.name}/fetchTodolistsTC`,
   async (_, thunkAPI) => {
     try {
+      showInfoToast(thunkAPI, "Get todolists in the process");
+
       thunkAPI.dispatch(getLoadingStatus({ status: "pending" }));
       const res = await todolistsApi.getTodolists();
+
       thunkAPI.dispatch(getLoadingStatus({ status: "succeeded" }));
+      showSuccessToast(thunkAPI, "Get todolists completed");
+
       return { todolists: res.data };
     } catch (error) {
       thunkAPI.dispatch(getLoadingStatus({ status: "failed" }));
-      return thunkAPI.rejectWithValue(error);
+      return handleHttpError(
+        thunkAPI,
+        error,
+        "An error occurred while receiving todolists"
+      );
     }
   }
 );
@@ -118,17 +137,29 @@ export const changeTodolistTitleTC = createAsyncThunk(
   `${todolistsSlice.name}/changeTodolistTitleTC`,
   async (payload: { id: string; newTitle: string }, thunkAPI) => {
     try {
+      showInfoToast(thunkAPI, "The title change of the todolist in progress");
+
       const res = await todolistsApi.changeTodolistTitle(
         payload.newTitle,
         payload.id
       );
+
       if (res.data.resultCode === 0) {
+        showSuccessToast(thunkAPI, "Change of todolist title was successful");
         return { id: payload.id, newTitle: payload.newTitle };
       } else {
-        return thunkAPI.rejectWithValue(res.data.messages[0]);
+        return handleResultError(
+          thunkAPI,
+          res.data,
+          "An error occurred while changing the todolist title"
+        );
       }
     } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+      return handleHttpError(
+        thunkAPI,
+        error,
+        "An error occurred while changing the todolist title"
+      );
     }
   }
 );
@@ -137,14 +168,26 @@ export const addTodolistTC = createAsyncThunk(
   `${todolistsSlice.name}/addTodolistTC`,
   async (payload: { title: string }, thunkAPI) => {
     try {
+      showInfoToast(thunkAPI, "Todolist create in progress");
+
       const res = await todolistsApi.createTodolist(payload.title);
+
       if (res.data.resultCode === 0) {
+        showSuccessToast(thunkAPI, "Todolist is created");
         return { title: payload.title, id: res.data.data.item.id };
       } else {
-        return thunkAPI.rejectWithValue(res.data.messages[0]);
+        return handleResultError(
+          thunkAPI,
+          res.data,
+          "An error occurred while creating the todolist"
+        );
       }
     } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+      return handleHttpError(
+        thunkAPI,
+        error,
+        "An error occurred while creating the todolist"
+      );
     }
   }
 );
@@ -159,26 +202,44 @@ export const deleteTodolistTC = createAsyncThunk(
           id: payload.id,
         })
       );
+
+      showInfoToast(thunkAPI, "Todolist deletion in progress");
+
       const res = await todolistsApi.removeTodolist(payload.id);
+
       if (res.data.resultCode === 0) {
-        changeTodolistEntityStatus({
-          entityStatus: "succeeded",
-          id: payload.id,
-        });
+        thunkAPI.dispatch(
+          changeTodolistEntityStatus({
+            entityStatus: "succeeded",
+            id: payload.id,
+          })
+        );
+
+        showSuccessToast(thunkAPI, "Todolist successfully removed");
         return { id: payload.id };
       } else {
+        thunkAPI.dispatch(
+          changeTodolistEntityStatus({
+            entityStatus: "failed",
+            id: payload.id,
+          })
+        );
+
+        return handleResultError(
+          thunkAPI,
+          res.data,
+          "Error while deleting todolist"
+        );
+      }
+    } catch (error) {
+      thunkAPI.dispatch(
         changeTodolistEntityStatus({
           entityStatus: "failed",
           id: payload.id,
-        });
-        return thunkAPI.rejectWithValue(res.data.messages[0]);
-      }
-    } catch (error) {
-      changeTodolistEntityStatus({
-        entityStatus: "failed",
-        id: payload.id,
-      });
-      return thunkAPI.rejectWithValue(error);
+        })
+      );
+
+      return handleHttpError(thunkAPI, error, "Error while deleting todolist");
     }
   }
 );

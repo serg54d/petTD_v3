@@ -11,6 +11,13 @@ import {
   selectTodolists,
 } from "./todolists-slice";
 import { getLoadingStatus } from "@/app/app-slice";
+import {
+  handleResultError,
+  handleHttpError,
+  showInfoToast,
+  showSuccessToast,
+  showErrorToast, // Добавлен импорт
+} from "@/common/utils/apiResponseHandlers";
 
 export const selectTasks = (state: RootState): TasksStateType => state.tasks;
 const initialState: TasksStateType = {};
@@ -47,11 +54,13 @@ export const tasksSlice = createSlice({
       .addCase(setTasksTC.fulfilled, (state, action) => {
         const { allTasks } = action.payload;
         Object.entries(allTasks).forEach(([todolistId, tasks]) => {
-          state[todolistId] = tasks.map((task) => ({
-            text: task.title,
-            id: task.id,
-            isDone: task.status,
-          }));
+          state[todolistId] = (tasks as DomainTaskType[]).map(
+            (task: DomainTaskType) => ({
+              text: task.title,
+              id: task.id,
+              isDone: task.status,
+            })
+          );
         });
       })
       .addCase(addTodolistTC.fulfilled, (state, action) => {
@@ -67,6 +76,7 @@ export const tasksSlice = createSlice({
 
 export const tasksReducer = tasksSlice.reducer;
 
+// ... остальные thunk'и без изменений
 export const changeTaskTitleTC = createAsyncThunk(
   `${tasksSlice.name}/changeTaskTitleTC`,
   async (
@@ -74,10 +84,13 @@ export const changeTaskTitleTC = createAsyncThunk(
     thunkAPI
   ) => {
     try {
+      showInfoToast(thunkAPI, "The title change of the task in progress");
+
       const state = thunkAPI.getState() as RootState;
       const task = selectTasks(state)[payload.todolistId].find(
         (task) => task.id === payload.taskId
       );
+
       if (task) {
         const model: ModelUpdateType = {
           completed: null,
@@ -88,21 +101,32 @@ export const changeTaskTitleTC = createAsyncThunk(
           status: task.isDone,
           title: payload.title,
         };
+
         const res = await tasksApi.updateTask(
           model,
           payload.todolistId,
           payload.taskId
         );
+
         if (res.data.resultCode === 0) {
+          showSuccessToast(thunkAPI, "The title change of the task completed");
           return payload;
         } else {
-          return thunkAPI.rejectWithValue(res.data.messages[0]);
+          return handleResultError(
+            thunkAPI,
+            res.data,
+            "The title change of the task ended with error"
+          );
         }
       } else {
         return thunkAPI.rejectWithValue("Task not found");
       }
     } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+      return handleHttpError(
+        thunkAPI,
+        error,
+        "The title change of the task ended with error"
+      );
     }
   }
 );
@@ -114,10 +138,13 @@ export const changeTaskStatusTC = createAsyncThunk(
     thunkAPI
   ) => {
     try {
+      showInfoToast(thunkAPI, "Change of task status is in progress");
+
       const state = thunkAPI.getState() as RootState;
       const task = selectTasks(state)[payload.todolistId].find(
         (task) => task.id === payload.taskId
       );
+
       if (task) {
         const model: ModelUpdateType = {
           completed: null,
@@ -128,21 +155,32 @@ export const changeTaskStatusTC = createAsyncThunk(
           status: payload.status,
           title: task.text,
         };
+
         const res = await tasksApi.updateTask(
           model,
           payload.todolistId,
           payload.taskId
         );
+
         if (res.data.resultCode === 0) {
+          showSuccessToast(thunkAPI, "Change of task status ended success");
           return payload;
         } else {
-          return thunkAPI.rejectWithValue(res.data.messages[0]);
+          return handleResultError(
+            thunkAPI,
+            res.data,
+            "Change of task status ended with error"
+          );
         }
       } else {
         return thunkAPI.rejectWithValue("Task not found");
       }
     } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+      return handleHttpError(
+        thunkAPI,
+        error,
+        "Change of task status ended with error"
+      );
     }
   }
 );
@@ -159,17 +197,29 @@ export const addTaskTC = createAsyncThunk(
     thunkAPI
   ) => {
     try {
+      showInfoToast(thunkAPI, "Task creation in progress");
+
       const res = await tasksApi.createTask(payload.todolistId, payload.text);
+
       if (res.data.resultCode === 0) {
+        showSuccessToast(thunkAPI, "Task created successfully");
         return {
           ...payload,
           taskId: res.data.data.item.id,
         };
       } else {
-        return thunkAPI.rejectWithValue(res.data.messages[0]);
+        return handleResultError(
+          thunkAPI,
+          res.data,
+          "An error occurred while creating the task"
+        );
       }
     } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+      return handleHttpError(
+        thunkAPI,
+        error,
+        "An error occurred while creating the task"
+      );
     }
   }
 );
@@ -178,14 +228,26 @@ export const removeTaskTC = createAsyncThunk(
   `${tasksSlice.name}/removeTaskTC`,
   async (payload: { taskId: string; todolistId: string }, thunkAPI) => {
     try {
+      showInfoToast(thunkAPI, "Task deletion in progress");
+
       const res = await tasksApi.deleteTask(payload.todolistId, payload.taskId);
+
       if (res.data.resultCode === 0) {
+        showSuccessToast(thunkAPI, "Task deletion completed successfully");
         return payload;
       } else {
-        return thunkAPI.rejectWithValue(res.data.messages[0]);
+        return handleResultError(
+          thunkAPI,
+          res.data,
+          "Task deletion failed with error"
+        );
       }
     } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+      return handleHttpError(
+        thunkAPI,
+        error,
+        "Task deletion failed with error"
+      );
     }
   }
 );
@@ -194,9 +256,11 @@ export const setTasksTC = createAsyncThunk(
   `${tasksSlice.name}/setTasksTC`,
   async (_, thunkAPI) => {
     try {
+      showInfoToast(thunkAPI, "Receiving task lists");
+
       const state = thunkAPI.getState() as RootState;
       const todolists = selectTodolists(state);
-      const allTasks: { [todolistId: string]: DomainTaskType[] } = {}; // Явная типизация
+      const allTasks: { [todolistId: string]: DomainTaskType[] } = {};
 
       for (const todolist of todolists) {
         try {
@@ -206,16 +270,22 @@ export const setTasksTC = createAsyncThunk(
           thunkAPI.dispatch(getLoadingStatus({ status: "succeeded" }));
         } catch (error) {
           thunkAPI.dispatch(getLoadingStatus({ status: "failed" }));
-          console.error(
-            `Failed to load tasks for todolist ${todolist.id}:`,
-            error
+          allTasks[todolist.id] = [];
+          showErrorToast(
+            thunkAPI,
+            `Failed to load tasks for todolist ${todolist.title}`
           );
-          allTasks[todolist.id] = []; // Добавляем пустой массив при ошибке
         }
       }
+
+      showSuccessToast(thunkAPI, "Task lists received successfully");
       return { allTasks };
     } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+      return handleHttpError(
+        thunkAPI,
+        error,
+        "An error occurred while retrieving task lists"
+      );
     }
   }
 );
