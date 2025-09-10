@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { TasksStateType } from "@/app/App";
 import { DomainTaskType } from "@/features/Todolists/api/types/tasksApi.types";
-
 import { TaskStatus } from "../../lib/enums";
 import { TaskType } from "../../ui/Todolist/Todolist";
 import { RootState } from "@/app/store";
@@ -11,6 +10,7 @@ import {
   deleteTodolistTC,
   selectTodolists,
 } from "./todolists-slice";
+import { getLoadingStatus } from "@/app/app-slice";
 
 export const selectTasks = (state: RootState): TasksStateType => state.tasks;
 const initialState: TasksStateType = {};
@@ -62,7 +62,7 @@ export const tasksSlice = createSlice({
         delete state[action.payload.id];
       });
   },
-  reducers: (create) => ({}),
+  reducers: () => ({}),
 });
 
 export const tasksReducer = tasksSlice.reducer;
@@ -200,10 +200,12 @@ export const setTasksTC = createAsyncThunk(
 
       for (const todolist of todolists) {
         try {
+          thunkAPI.dispatch(getLoadingStatus({ status: "pending" }));
           const res = await tasksApi.getTasks(todolist.id);
-          console.log("Tasks from server:", res.data.items);
           allTasks[todolist.id] = res.data.items;
+          thunkAPI.dispatch(getLoadingStatus({ status: "succeeded" }));
         } catch (error) {
+          thunkAPI.dispatch(getLoadingStatus({ status: "failed" }));
           console.error(
             `Failed to load tasks for todolist ${todolist.id}:`,
             error

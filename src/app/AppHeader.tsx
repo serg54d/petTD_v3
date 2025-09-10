@@ -8,13 +8,19 @@ import { MaterialUISwitch } from "@/common/components";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useAppSelector } from "@/common/hooks/useAppSelector";
 import { useAppDispatch } from "@/common/hooks/useAppDispatch";
-import { changeThemeModeAC, selectTheme } from "@/app/app-slice";
+import {
+  changeThemeModeAC,
+  selectLoadingGetStatus,
+  selectTheme,
+} from "@/app/app-slice";
+import LinearProgress from "@mui/material/LinearProgress";
 
 export type ThemeMode = "dark" | "light";
 
 export const AppHeader = () => {
   const dispatch = useAppDispatch();
   const themeMode = useAppSelector(selectTheme);
+  const loadGetStatus = useAppSelector(selectLoadingGetStatus);
   const handleThemeToggle = () => {
     dispatch(changeThemeModeAC({ themeMode }));
   };
@@ -40,6 +46,7 @@ export const AppHeader = () => {
             onChange={handleThemeToggle}
           />
         </Toolbar>
+        {loadGetStatus === "pending" && <LinearProgress />}
       </AppBar>
     </Box>
   );

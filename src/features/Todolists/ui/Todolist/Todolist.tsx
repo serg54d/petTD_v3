@@ -7,7 +7,6 @@ import { EmptyList } from "@/common/components";
 import { FilterButtons } from "@/common/components/FilterButtons";
 import { TodolistHeader } from "./TodolistHeader";
 import { Tasks } from "@/features/Todolists/ui/Todolist/Tasks/Tasks";
-import { todolistsApi } from "../../api/requests/todolistsApi";
 import { TaskStatus } from "../../lib/enums";
 import { FilterValues } from "@/common/enums/enums";
 import {
@@ -57,9 +56,13 @@ export const Todolist = (props: TodolistPropsType) => {
         title={props.todolist.title}
         onChangeTitle={changeTodolistTitleHandler}
         onDelete={deleteTodolistHandler}
+        disabled={props.todolist.entityStatus === "pending"}
       />
 
-      <AddItemForm addItem={createTaskHandler} />
+      <AddItemForm
+        addItem={createTaskHandler}
+        disabled={props.todolist.entityStatus === "pending"}
+      />
 
       {props.tasks.length === 0 ? (
         <EmptyList />

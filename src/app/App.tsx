@@ -7,11 +7,14 @@ import { useAppSelector } from "@/common/hooks/useAppSelector";
 import { TaskType } from "@/features/Todolists/ui/Todolist/Todolist";
 import { FilterValues } from "@/common/enums/enums";
 import { selectTheme } from "./app-slice";
+import { useEffect } from "react";
+import { RequestStatus } from "@/common/types/types";
 
 export type TodolistType = {
   id: string;
   title: string;
   filter: FilterValues;
+  entityStatus: RequestStatus;
   // опциональные поля из API
   addedDate?: string;
   order?: number;
@@ -22,9 +25,17 @@ export type TasksStateType = {
 
 function App() {
   const themeMode = useAppSelector(selectTheme);
+  useEffect(() => {
+    if (themeMode === "dark") {
+      document.body.classList.add("dark-theme");
+    } else {
+      document.body.classList.remove("dark-theme");
+    }
+  }, [themeMode]);
+
   const theme = createTheme({
     palette: {
-      mode: themeMode, // 'light' или 'dark'
+      mode: themeMode,
       primary: {
         main: themeMode === "dark" ? "#6d9ee6" : "#4a6fa5",
       },

@@ -31,26 +31,32 @@ export const Todolists = () => {
     });
   }, [dispatch]);
   return (
-    <div className="todolists-container">
-      {todolists.map((todolist) => {
-        let filteredTasks = tasks[todolist.id] || [];
-        if (todolist.filter === "active") {
-          filteredTasks = filteredTasks.filter(
-            (task: TaskType) => task.isDone === TaskStatus.Active
+    <div className="todolists-wrapper">
+      {" "}
+      {/* Новый враппер */}
+      <div className="todolists-container">
+        {" "}
+        {/* Контейнер с inline-flex */}
+        {todolists.map((todolist) => {
+          let filteredTasks = tasks[todolist.id] || [];
+          if (todolist.filter === "active") {
+            filteredTasks = filteredTasks.filter(
+              (task: TaskType) => task.isDone === TaskStatus.Active
+            );
+          } else if (todolist.filter === "completed") {
+            filteredTasks = filteredTasks.filter(
+              (task: TaskType) => task.isDone === TaskStatus.Completed
+            );
+          }
+          return (
+            <Todolist
+              key={todolist.id}
+              todolist={todolist}
+              tasks={filteredTasks}
+            />
           );
-        } else if (todolist.filter === "completed") {
-          filteredTasks = filteredTasks.filter(
-            (task: TaskType) => task.isDone === TaskStatus.Completed
-          );
-        }
-        return (
-          <Todolist
-            key={todolist.id}
-            todolist={todolist}
-            tasks={filteredTasks}
-          />
-        );
-      })}
+        })}
+      </div>
     </div>
   );
 };

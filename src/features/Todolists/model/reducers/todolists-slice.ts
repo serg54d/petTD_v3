@@ -5,6 +5,8 @@ import { TodolistType } from "@/app/App";
 import { FilterValues } from "@/common/enums/enums";
 import { todolistsApi } from "../../api/requests/todolistsApi";
 import { RootState } from "@/app/store";
+import { getLoadingStatus } from "@/app/app-slice";
+import { RequestStatus } from "@/common/types/types";
 
 export const selectTodolists = (state: RootState): TodolistType[] =>
   state.todolists;
@@ -25,6 +27,7 @@ export const todolistsSlice = createSlice({
             filter: FilterValues.All,
             addedDate: todolist.addedDate,
             order: todolist.order,
+            entityStatus: "idle" as RequestStatus,
           }));
           state.push(...transformedTodolists);
         }
@@ -48,6 +51,7 @@ export const todolistsSlice = createSlice({
           filter: FilterValues.All,
           id,
           title,
+          entityStatus: "idle",
         };
         state.push(newTodolist);
       })
@@ -77,10 +81,20 @@ export const todolistsSlice = createSlice({
         todolist.filter = newFilter;
       }
     }),
+    changeTodolistEntityStatus: create.reducer<{
+      entityStatus: RequestStatus;
+      id: string;
+    }>((state, action) => {
+      const { entityStatus, id } = action.payload;
+      const todolist = state.find((tl) => tl.id === id);
+      if (!todolist) return;
+      todolist.entityStatus = entityStatus;
+    }),
   }),
 });
 
-export const { changeTodolistFilter } = todolistsSlice.actions;
+export const { changeTodolistFilter, changeTodolistEntityStatus } =
+  todolistsSlice.actions;
 export const todolistsReducer = todolistsSlice.reducer;
 
 // Thunks
@@ -89,10 +103,12 @@ export const fetchTodolistsTC = createAsyncThunk(
   `${todolistsSlice.name}/fetchTodolistsTC`,
   async (_, thunkAPI) => {
     try {
+      thunkAPI.dispatch(getLoadingStatus({ status: "pending" }));
       const res = await todolistsApi.getTodolists();
+      thunkAPI.dispatch(getLoadingStatus({ status: "succeeded" }));
       return { todolists: res.data };
     } catch (error) {
-      //   console.log("Failed to load data: ", error);
+      thunkAPI.dispatch(getLoadingStatus({ status: "failed" }));
       return thunkAPI.rejectWithValue(error);
     }
   }
@@ -137,13 +153,31 @@ export const deleteTodolistTC = createAsyncThunk(
   `${todolistsSlice.name}/deleteTodolistTC`,
   async (payload: { id: string }, thunkAPI) => {
     try {
+      thunkAPI.dispatch(
+        changeTodolistEntityStatus({
+          entityStatus: "pending",
+          id: payload.id,
+        })
+      );
       const res = await todolistsApi.removeTodolist(payload.id);
       if (res.data.resultCode === 0) {
+        changeTodolistEntityStatus({
+          entityStatus: "succeeded",
+          id: payload.id,
+        });
         return { id: payload.id };
       } else {
+        changeTodolistEntityStatus({
+          entityStatus: "failed",
+          id: payload.id,
+        });
         return thunkAPI.rejectWithValue(res.data.messages[0]);
       }
     } catch (error) {
+      changeTodolistEntityStatus({
+        entityStatus: "failed",
+        id: payload.id,
+      });
       return thunkAPI.rejectWithValue(error);
     }
   }

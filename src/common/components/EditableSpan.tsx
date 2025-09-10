@@ -5,12 +5,14 @@ type EditableSpanType = {
   title: string;
   onChangeTitle: (newTitle: string) => void;
   className?: string;
+  disabled?: boolean;
 };
 
 export const EditableSpan = ({
   title,
   onChangeTitle,
   className = "",
+  disabled,
 }: EditableSpanType) => {
   const [editMode, setEditMode] = useState(false);
   const [text, setText] = useState(title);
@@ -38,6 +40,7 @@ export const EditableSpan = ({
       size="small"
       label="Edit"
       variant="outlined"
+      disabled={disabled}
     />
   );
 };

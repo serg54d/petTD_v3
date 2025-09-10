@@ -6,11 +6,12 @@ import { Box } from "@mui/material";
 
 type AddItemFormProps = {
   addItem: (title: string) => void;
+  disabled?: boolean;
 };
 
 const MAX_TITLE_LENGTH = 15;
 
-export const AddItemForm = ({ addItem }: AddItemFormProps) => {
+export const AddItemForm = ({ addItem, disabled }: AddItemFormProps) => {
   const [itemTitle, setItemTitle] = useState("");
   const [inputError, setInputError] = useState(false);
 
@@ -55,12 +56,11 @@ export const AddItemForm = ({ addItem }: AddItemFormProps) => {
           size="small"
           error={!!inputError}
           color="secondary"
-        
+          disabled={disabled}
         />
         <IconButton
           onClick={handleAddItem}
           color={isTitleLengthValid && !inputError ? "primary" : "error"}
-        
         >
           <AddTaskIcon />
         </IconButton>
