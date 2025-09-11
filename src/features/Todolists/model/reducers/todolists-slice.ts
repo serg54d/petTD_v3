@@ -15,6 +15,7 @@ import {
   showSuccessToast,
 } from "@/common/utils/apiResponseHandlers";
 import { Todolists } from "../../Todolists";
+import { ResultCode } from "../../lib/enums";
 
 export const selectTodolists = (state: RootState): TodolistType[] =>
   state.todolists;
@@ -144,7 +145,7 @@ export const changeTodolistTitleTC = createAsyncThunk(
         payload.id
       );
 
-      if (res.data.resultCode === 0) {
+      if (res.data.resultCode === ResultCode.Success) {
         showSuccessToast(thunkAPI, "Change of todolist title was successful");
         return { id: payload.id, newTitle: payload.newTitle };
       } else {
@@ -172,7 +173,7 @@ export const addTodolistTC = createAsyncThunk(
 
       const res = await todolistsApi.createTodolist(payload.title);
 
-      if (res.data.resultCode === 0) {
+      if (res.data.resultCode === ResultCode.Success) {
         showSuccessToast(thunkAPI, "Todolist is created");
         return { title: payload.title, id: res.data.data.item.id };
       } else {
@@ -207,7 +208,7 @@ export const deleteTodolistTC = createAsyncThunk(
 
       const res = await todolistsApi.removeTodolist(payload.id);
 
-      if (res.data.resultCode === 0) {
+      if (res.data.resultCode === ResultCode.Success) {
         thunkAPI.dispatch(
           changeTodolistEntityStatus({
             entityStatus: "succeeded",

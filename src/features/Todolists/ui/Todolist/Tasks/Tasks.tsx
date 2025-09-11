@@ -14,7 +14,7 @@ import {
   ModelUpdateType,
   tasksApi,
 } from "@/features/Todolists/api/requests/tasksApi";
-import { TaskStatus } from "@/features/Todolists/lib/enums";
+import { ResultCode, TaskStatus } from "@/features/Todolists/lib/enums";
 
 type TasksPropsType = {
   tasks: TaskType[];
@@ -44,7 +44,7 @@ export const Tasks = (props: TasksPropsType) => {
       taskId
     );
     try {
-      if (response.data.resultCode === 0) {
+      if (response.data.resultCode === ResultCode.Success) {
         dispatch(
           changeTaskStatusTC({ todolistId: props.todolist.id, taskId, status })
         );
@@ -67,6 +67,10 @@ export const Tasks = (props: TasksPropsType) => {
         <TaskItem
           key={task.id}
           task={task}
+          disabled={
+            props.todolist.entityStatus === "pending" ||
+            task.entityStatusTask === "pending"
+          }
           onChangeStatus={changeTaskStatusHandler}
           onChangeTitle={changeTaskTitleHandler}
           onRemove={removeTaskHandler}

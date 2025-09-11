@@ -1,3 +1,5 @@
+import { ResultCode } from "../../lib/enums";
+
 export type DomainTaskType = {
   description: string | null;
   title: string;
@@ -13,7 +15,7 @@ export type DomainTaskType = {
 };
 
 export type BaseTaskResponse<T = {}> = {
-  resultCode: number;
+  resultCode: ResultCode;
   messages: string[];
   data: T;
 };

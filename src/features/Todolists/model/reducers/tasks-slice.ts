@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { TasksStateType } from "@/app/App";
 import { DomainTaskType } from "@/features/Todolists/api/types/tasksApi.types";
-import { TaskStatus } from "../../lib/enums";
+import { ResultCode, TaskStatus } from "../../lib/enums";
 import { TaskType } from "../../ui/Todolist/Todolist";
 import { RootState } from "@/app/store";
 import { ModelUpdateType, tasksApi } from "../../api/requests/tasksApi";
@@ -18,6 +18,7 @@ import {
   showSuccessToast,
   showErrorToast, // Добавлен импорт
 } from "@/common/utils/apiResponseHandlers";
+import { RequestStatus } from "@/common/types/types";
 
 export const selectTasks = (state: RootState): TasksStateType => state.tasks;
 const initialState: TasksStateType = {};
@@ -43,7 +44,12 @@ export const tasksSlice = createSlice({
       })
       .addCase(addTaskTC.fulfilled, (state, action) => {
         const { taskId, todolistId, text, status } = action.payload;
-        const newTask: TaskType = { id: taskId, isDone: status, text };
+        const newTask: TaskType = {
+          id: taskId,
+          isDone: status,
+          entityStatusTask: "idle",
+          text,
+        };
         state[todolistId].unshift(newTask);
       })
       .addCase(removeTaskTC.fulfilled, (state, action) => {
@@ -59,6 +65,7 @@ export const tasksSlice = createSlice({
               text: task.title,
               id: task.id,
               isDone: task.status,
+              entityStatusTask: "idle",
             })
           );
         });
@@ -71,10 +78,23 @@ export const tasksSlice = createSlice({
         delete state[action.payload.id];
       });
   },
-  reducers: () => ({}),
+  reducers: (create) => ({
+    changeEntityStatusTask: create.reducer<{
+      taskId: string;
+      entityStatus: RequestStatus;
+      todolistId: string;
+    }>((state, action) => {
+      const { entityStatus, taskId, todolistId } = action.payload;
+      const task = state[todolistId].find((task) => task.id === taskId);
+      if (task) {
+        task.entityStatusTask = entityStatus;
+      }
+    }),
+  }),
 });
 
 export const tasksReducer = tasksSlice.reducer;
+export const { changeEntityStatusTask } = tasksSlice.actions;
 
 // ... остальные thunk'и без изменений
 export const changeTaskTitleTC = createAsyncThunk(
@@ -108,7 +128,7 @@ export const changeTaskTitleTC = createAsyncThunk(
           payload.taskId
         );
 
-        if (res.data.resultCode === 0) {
+        if (res.data.resultCode === ResultCode.Success) {
           showSuccessToast(thunkAPI, "The title change of the task completed");
           return payload;
         } else {
@@ -162,7 +182,7 @@ export const changeTaskStatusTC = createAsyncThunk(
           payload.taskId
         );
 
-        if (res.data.resultCode === 0) {
+        if (res.data.resultCode === ResultCode.Success) {
           showSuccessToast(thunkAPI, "Change of task status ended success");
           return payload;
         } else {
@@ -201,7 +221,7 @@ export const addTaskTC = createAsyncThunk(
 
       const res = await tasksApi.createTask(payload.todolistId, payload.text);
 
-      if (res.data.resultCode === 0) {
+      if (res.data.resultCode === ResultCode.Success) {
         showSuccessToast(thunkAPI, "Task created successfully");
         return {
           ...payload,
@@ -229,10 +249,16 @@ export const removeTaskTC = createAsyncThunk(
   async (payload: { taskId: string; todolistId: string }, thunkAPI) => {
     try {
       showInfoToast(thunkAPI, "Task deletion in progress");
-
+      thunkAPI.dispatch(
+        changeEntityStatusTask({
+          entityStatus: "pending",
+          taskId: payload.taskId,
+          todolistId: payload.todolistId,
+        })
+      );
       const res = await tasksApi.deleteTask(payload.todolistId, payload.taskId);
 
-      if (res.data.resultCode === 0) {
+      if (res.data.resultCode === ResultCode.Success) {
         showSuccessToast(thunkAPI, "Task deletion completed successfully");
         return payload;
       } else {

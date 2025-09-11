@@ -18,6 +18,7 @@ type TaskItemProps = {
   onChangeStatus: (taskId: string, newStatus: TaskStatus) => void;
   onChangeTitle: (taskId: string, newTitle: string) => void;
   onRemove: (taskId: string) => void;
+  disabled: boolean;
 };
 
 export const TaskItem = ({
@@ -25,6 +26,7 @@ export const TaskItem = ({
   onChangeStatus,
   onChangeTitle,
   onRemove,
+  disabled,
 }: TaskItemProps) => {
   const changeTaskStatusHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const status = e.currentTarget.checked
@@ -43,13 +45,22 @@ export const TaskItem = ({
   const isChecked = task.isDone === TaskStatus.Completed;
   return (
     <ListItem key={task.id} sx={getListItemSx(isChecked)}>
-      <Checkbox checked={isChecked} onChange={changeTaskStatusHandler} />
+      <Checkbox
+        checked={isChecked}
+        onChange={changeTaskStatusHandler}
+        disabled={disabled}
+      />
       <EditableSpan
         className="task-text"
         title={task.text}
         onChangeTitle={changeTaskTitleHandler}
+        disabled={disabled}
       />
-      <IconButton aria-label="delete" onClick={removeTaskHandler}>
+      <IconButton
+        aria-label="delete"
+        onClick={removeTaskHandler}
+        disabled={disabled}
+      >
         <DeleteIcon />
       </IconButton>
     </ListItem>

@@ -14,11 +14,13 @@ import {
   changeTodolistTitleTC,
   deleteTodolistTC,
 } from "../../model/reducers/todolists-slice";
+import { RequestStatus } from "@/common/types/types";
 
 export type TaskType = {
   id: string;
   isDone: TaskStatus;
   text: string;
+  entityStatusTask: RequestStatus;
 };
 
 export type TodolistPropsType = {
