@@ -13,9 +13,11 @@ import {
   handleHttpError,
   showInfoToast,
   showSuccessToast,
+  showInfoWithCanceledToast,
 } from "@/common/utils/apiResponseHandlers";
 import { Todolists } from "../../Todolists";
 import { ResultCode } from "../../lib/enums";
+import { toastSelector } from "@/common/components/Toast/toast-slice";
 
 export const selectTodolists = (state: RootState): TodolistType[] =>
   state.todolists;
@@ -204,34 +206,49 @@ export const deleteTodolistTC = createAsyncThunk(
         })
       );
 
-      showInfoToast(thunkAPI, "Todolist deletion in progress");
+      showInfoWithCanceledToast(thunkAPI, "Todolist deletion in progress");
 
-      const res = await todolistsApi.removeTodolist(payload.id);
+      // задержка для возможности отмены действия
+      setTimeout(async () => {
+        const state = thunkAPI.getState() as RootState;
+        const { status: toastStatus } = toastSelector(state);
+        if (toastStatus === "canceled") {
+          thunkAPI.dispatch(
+            changeTodolistEntityStatus({
+              entityStatus: "idle",
+              id: payload.id,
+            })
+          );
+          return; // Прерываем выполнение
+        }
 
-      if (res.data.resultCode === ResultCode.Success) {
-        thunkAPI.dispatch(
-          changeTodolistEntityStatus({
-            entityStatus: "succeeded",
-            id: payload.id,
-          })
-        );
+        const res = await todolistsApi.removeTodolist(payload.id);
 
-        showSuccessToast(thunkAPI, "Todolist successfully removed");
-        return { id: payload.id };
-      } else {
-        thunkAPI.dispatch(
-          changeTodolistEntityStatus({
-            entityStatus: "failed",
-            id: payload.id,
-          })
-        );
+        if (res.data.resultCode === ResultCode.Success) {
+          thunkAPI.dispatch(
+            changeTodolistEntityStatus({
+              entityStatus: "succeeded",
+              id: payload.id,
+            })
+          );
 
-        return handleResultError(
-          thunkAPI,
-          res.data,
-          "Error while deleting todolist"
-        );
-      }
+          showSuccessToast(thunkAPI, "Todolist successfully removed");
+          return { id: payload.id };
+        } else {
+          thunkAPI.dispatch(
+            changeTodolistEntityStatus({
+              entityStatus: "failed",
+              id: payload.id,
+            })
+          );
+
+          return handleResultError(
+            thunkAPI,
+            res.data,
+            "Error while deleting todolist"
+          );
+        }
+      }, 3000);
     } catch (error) {
       thunkAPI.dispatch(
         changeTodolistEntityStatus({

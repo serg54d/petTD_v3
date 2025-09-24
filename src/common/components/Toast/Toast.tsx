@@ -2,15 +2,20 @@ import * as React from "react";
 import Snackbar, { SnackbarCloseReason } from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import { useAppSelector } from "@/common/hooks/useAppSelector";
-import { toastSelector } from "./toast-slice";
+import { changeToast, toastSelector } from "./toast-slice";
 import { useEffect } from "react";
+import CircularProgress from "@mui/material/CircularProgress";
+import Button from "@mui/material/Button";
+import { useAppDispatch } from "@/common/hooks/useAppDispatch";
 
 export type ToastStatusType =
   | "error"
   | "info"
   | "warning"
   | "success"
-  | "noActive";
+  | "noActive"
+  | "infoWithCanceled"
+  | "canceled";
 
 export type ToastType = {
   status: ToastStatusType;
@@ -19,9 +24,11 @@ export type ToastType = {
 
 export default function Toast() {
   //   debugger;
+  const dispatch = useAppDispatch();
   const toast = useAppSelector(toastSelector);
 
   const [open, setOpen] = React.useState(false);
+  const autoHideDuration = toast.status === "info" ? null : 6000;
 
   useEffect(() => {
     if (toast.status !== "noActive") {
@@ -44,16 +51,52 @@ export default function Toast() {
     return;
   }
 
+  const changeStatusCancelHandler = () => {
+    dispatch(
+      changeToast({
+        status: "canceled",
+        notification: "Cancellation completed",
+      })
+    );
+  };
+
   return (
     <div>
-      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+      <Snackbar
+        open={open}
+        autoHideDuration={autoHideDuration}
+        onClose={handleClose}
+      >
         <Alert
           onClose={handleClose}
-          severity={toast.status}
+          severity={
+            toast.status === "error" ||
+            toast.status === "info" ||
+            toast.status === "success" ||
+            toast.status === "warning"
+              ? toast.status
+              : undefined
+          }
+          className={toast.status === "canceled" ? "alert-cancel" : undefined}
           variant="filled"
           sx={{ width: "100%" }}
+          icon={
+            toast.status === "info" ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : undefined
+          }
         >
           {toast.notification}
+
+          {toast.status === "infoWithCanceled" ? (
+            <Button
+              onClick={changeStatusCancelHandler}
+              sx={{ color: "#fff", marginLeft: "10px" }}
+              size="small"
+            >
+              Cancel
+            </Button>
+          ) : undefined}
         </Alert>
       </Snackbar>
     </div>

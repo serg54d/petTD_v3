@@ -277,6 +277,11 @@ button:disabled {
 	background-color: var(--success-color);
 }
 
+.alert-cancel {
+	background-color: #166088 !important;
+	
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
 	.todolist {

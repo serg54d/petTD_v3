@@ -1,6 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { TasksStateType } from "@/app/App";
-import { DomainTaskType } from "@/features/Todolists/api/types/tasksApi.types";
+import {
+  BaseTaskResponse,
+  DomainTaskType,
+} from "@/features/Todolists/api/types/tasksApi.types";
 import { ResultCode, TaskStatus } from "../../lib/enums";
 import { TaskType } from "../../ui/Todolist/Todolist";
 import { RootState } from "@/app/store";
@@ -16,9 +19,12 @@ import {
   handleHttpError,
   showInfoToast,
   showSuccessToast,
-  showErrorToast, // Добавлен импорт
+  showErrorToast,
+  showInfoWithCanceledToast, // Добавлен импорт
 } from "@/common/utils/apiResponseHandlers";
 import { RequestStatus } from "@/common/types/types";
+import { AxiosResponse } from "axios";
+import { toastSelector } from "@/common/components/Toast/toast-slice";
 
 export const selectTasks = (state: RootState): TasksStateType => state.tasks;
 const initialState: TasksStateType = {};
@@ -248,7 +254,8 @@ export const removeTaskTC = createAsyncThunk(
   `${tasksSlice.name}/removeTaskTC`,
   async (payload: { taskId: string; todolistId: string }, thunkAPI) => {
     try {
-      showInfoToast(thunkAPI, "Task deletion in progress");
+      showInfoWithCanceledToast(thunkAPI, "Task deletion in progress");
+
       thunkAPI.dispatch(
         changeEntityStatusTask({
           entityStatus: "pending",
@@ -256,18 +263,37 @@ export const removeTaskTC = createAsyncThunk(
           todolistId: payload.todolistId,
         })
       );
-      const res = await tasksApi.deleteTask(payload.todolistId, payload.taskId);
 
-      if (res.data.resultCode === ResultCode.Success) {
-        showSuccessToast(thunkAPI, "Task deletion completed successfully");
-        return payload;
-      } else {
-        return handleResultError(
-          thunkAPI,
-          res.data,
-          "Task deletion failed with error"
-        );
-      }
+      // задержка для возможности отмены действия
+      setTimeout(async () => {
+       
+        const state = thunkAPI.getState() as RootState;
+        const { status: toastStatus } = toastSelector(state);
+
+        if (toastStatus === "canceled") {
+          thunkAPI.dispatch(
+            changeEntityStatusTask({
+              entityStatus: "idle",
+              taskId: payload.taskId,
+              todolistId: payload.todolistId,
+            })
+          );
+          return; // Прерываем выполнение
+        }
+
+        const res = await tasksApi.deleteTask(payload.todolistId, payload.taskId);
+
+        if (res.data.resultCode === ResultCode.Success) {
+          showSuccessToast(thunkAPI, "Task deletion completed successfully");
+          return payload;
+        } else {
+          return handleResultError(
+            thunkAPI,
+            res.data,
+            "Task deletion failed with error"
+          );
+        }
+      }, 3000);
     } catch (error) {
       return handleHttpError(
         thunkAPI,

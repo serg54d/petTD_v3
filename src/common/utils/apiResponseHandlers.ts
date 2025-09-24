@@ -13,6 +13,15 @@ export const showInfoToast = (thunkAPI: any, message: string) => {
   );
 };
 
+export const showInfoWithCanceledToast = (thunkAPI: any, message: string) => {
+  thunkAPI.dispatch(
+    changeToast({
+      status: "infoWithCanceled",
+      notification: message,
+    })
+  );
+};
+
 /**
  * Показать success тост
  */
