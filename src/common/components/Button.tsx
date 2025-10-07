@@ -1,5 +1,6 @@
 import Button from "@mui/material/Button";
 import { ReactNode } from "react";
+import { NavLink } from "react-router";
 
 type CustomButtonProps = {
   children: ReactNode;
@@ -15,6 +16,8 @@ type CustomButtonProps = {
     | "warning";
   onClick?: () => void;
   disabled?: boolean;
+  to?: string;
+  type?: 'submit'| 'button' | 'reset';
 };
 
 export const CustomButton = ({
@@ -24,6 +27,8 @@ export const CustomButton = ({
   color = "primary",
   onClick,
   disabled = false,
+  to,
+  type,
 }: CustomButtonProps) => {
   return (
     <Button
@@ -32,8 +37,9 @@ export const CustomButton = ({
       color={color}
       onClick={onClick}
       disabled={disabled}
+	  type={type}
     >
-      {children}
+      {to ? <NavLink to={to}>{children}</NavLink> : children}
     </Button>
   );
 };

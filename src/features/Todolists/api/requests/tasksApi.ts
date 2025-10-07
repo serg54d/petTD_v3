@@ -1,5 +1,4 @@
 import { instance } from "@/common/instance/instance";
-// import { TaskType } from "../../ui/Todolist/Todolist";
 import { BaseTaskResponse, DomainTaskType } from "../types/tasksApi.types";
 
 export type ModelUpdateType = {

@@ -3,6 +3,7 @@ import { tasksReducer } from "@/features/Todolists/model/reducers/tasks-slice";
 import { todolistsReducer } from "@/features/Todolists/model/reducers/todolists-slice";
 import { appReducer } from "@/app/app-slice";
 import { toastReducer } from "@/common/components/Toast/toast-slice";
+import { authReducer } from "@/features/auth/model/auth-slice";
 
 // объединение reducer'ов с помощью combineReducers
 const rootReducer = combineReducers({
@@ -10,6 +11,7 @@ const rootReducer = combineReducers({
   todolists: todolistsReducer,
   app: appReducer,
   toast: toastReducer,
+  auth: authReducer,
 });
 
 // создание store

@@ -10,6 +10,11 @@ import { selectTheme } from "./app-slice";
 import { useEffect } from "react";
 import { RequestStatus } from "@/common/types/types";
 import Toast from "@/common/components/Toast/Toast";
+import { Routes } from "react-router";
+import { Routing } from "@/common/routing";
+import { useAppDispatch } from "@/common/hooks/useAppDispatch";
+import { meTC, selectAuth } from "@/features/auth/model/auth-slice";
+import CircularProgressWithLabel from "@/common/components/CircularProgressWithLabel";
 
 export type TodolistType = {
   id: string;
@@ -49,13 +54,36 @@ function App() {
       },
     },
   });
+  const dispatch = useAppDispatch();
+  const { isLoggedIn } = useAppSelector(selectAuth);
+
+  useEffect(() => {
+    dispatch(meTC());
+  }, []);
+
+  if (isLoggedIn === undefined) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          width: "100%",
+          height: "100vh",
+        }}
+      >
+        <CircularProgressWithLabel />
+      </div>
+    );
+  }
 
   return (
     <div className="app">
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <AppHeader />
-        <AppMain />
+
+        <Routing />
         <Toast />
       </ThemeProvider>
     </div>

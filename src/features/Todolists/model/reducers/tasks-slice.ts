@@ -1,12 +1,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { TasksStateType } from "@/app/App";
 import {
-  BaseTaskResponse,
+  domainTaskSchema,
   DomainTaskType,
 } from "@/features/Todolists/api/types/tasksApi.types";
 import { ResultCode, TaskStatus } from "../../lib/enums";
 import { TaskType } from "../../ui/Todolist/Todolist";
-import { RootState } from "@/app/store";
+import { AppDispatch, RootState } from "@/app/store";
 import { ModelUpdateType, tasksApi } from "../../api/requests/tasksApi";
 import {
   addTodolistTC,
@@ -23,8 +23,9 @@ import {
   showInfoWithCanceledToast, // Добавлен импорт
 } from "@/common/utils/apiResponseHandlers";
 import { RequestStatus } from "@/common/types/types";
-import { AxiosResponse } from "axios";
+
 import { toastSelector } from "@/common/components/Toast/toast-slice";
+import { safeZodParse, safeZodParseArray } from "@/common/utils/zodValidation";
 
 export const selectTasks = (state: RootState): TasksStateType => state.tasks;
 const initialState: TasksStateType = {};
@@ -49,12 +50,13 @@ export const tasksSlice = createSlice({
         }
       })
       .addCase(addTaskTC.fulfilled, (state, action) => {
-        const { taskId, todolistId, text, status } = action.payload;
+        const { taskId, todolistId, text, status, addedDate } = action.payload;
         const newTask: TaskType = {
           id: taskId,
           isDone: status,
           entityStatusTask: "idle",
           text,
+          addedDate: addedDate,
         };
         state[todolistId].unshift(newTask);
       })
@@ -72,6 +74,7 @@ export const tasksSlice = createSlice({
               id: task.id,
               isDone: task.status,
               entityStatusTask: "idle",
+              addedDate: task.addedDate,
             })
           );
         });
@@ -160,7 +163,12 @@ export const changeTaskTitleTC = createAsyncThunk(
 export const changeTaskStatusTC = createAsyncThunk(
   `${tasksSlice.name}/changeTaskStatusTC`,
   async (
-    payload: { todolistId: string; taskId: string; status: TaskStatus },
+    payload: {
+      todolistId: string;
+      taskId: string;
+      status: TaskStatus;
+      addedDate: string;
+    },
     thunkAPI
   ) => {
     try {
@@ -227,10 +235,17 @@ export const addTaskTC = createAsyncThunk(
 
       const res = await tasksApi.createTask(payload.todolistId, payload.text);
 
+      safeZodParse(
+        domainTaskSchema,
+        res.data.data.item,
+        `New task created: "${payload.text}"`
+      );
+
       if (res.data.resultCode === ResultCode.Success) {
         showSuccessToast(thunkAPI, "Task created successfully");
         return {
           ...payload,
+          addedDate: res.data.data.item.addedDate,
           taskId: res.data.data.item.id,
         };
       } else {
@@ -266,7 +281,6 @@ export const removeTaskTC = createAsyncThunk(
 
       // задержка для возможности отмены действия
       setTimeout(async () => {
-       
         const state = thunkAPI.getState() as RootState;
         const { status: toastStatus } = toastSelector(state);
 
@@ -281,7 +295,10 @@ export const removeTaskTC = createAsyncThunk(
           return; // Прерываем выполнение
         }
 
-        const res = await tasksApi.deleteTask(payload.todolistId, payload.taskId);
+        const res = await tasksApi.deleteTask(
+          payload.todolistId,
+          payload.taskId
+        );
 
         if (res.data.resultCode === ResultCode.Success) {
           showSuccessToast(thunkAPI, "Task deletion completed successfully");
@@ -308,16 +325,29 @@ export const setTasksTC = createAsyncThunk(
   `${tasksSlice.name}/setTasksTC`,
   async (_, thunkAPI) => {
     try {
-      showInfoToast(thunkAPI, "Receiving task lists");
-
       const state = thunkAPI.getState() as RootState;
       const todolists = selectTodolists(state);
       const allTasks: { [todolistId: string]: DomainTaskType[] } = {};
+
+      if (todolists.length === 0) {
+        return { allTasks: {} };
+      }
+
+      showInfoToast(thunkAPI, "Receiving task lists");
 
       for (const todolist of todolists) {
         try {
           thunkAPI.dispatch(getLoadingStatus({ status: "pending" }));
           const res = await tasksApi.getTasks(todolist.id);
+          //   domainTaskSchema.array().parse(res.data.items);
+
+          // zod логирование
+          safeZodParseArray(
+            domainTaskSchema,
+            res.data.items,
+            `setTasksTC for todolist "${todolist.title}" (${todolist.id})`
+          );
+
           allTasks[todolist.id] = res.data.items;
           thunkAPI.dispatch(getLoadingStatus({ status: "succeeded" }));
         } catch (error) {

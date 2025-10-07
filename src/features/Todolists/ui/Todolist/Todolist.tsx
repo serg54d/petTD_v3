@@ -21,6 +21,7 @@ export type TaskType = {
   isDone: TaskStatus;
   text: string;
   entityStatusTask: RequestStatus;
+  addedDate: string;
 };
 
 export type TodolistPropsType = {

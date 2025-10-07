@@ -14,6 +14,7 @@ type TaskItemProps = {
     id: string;
     isDone: TaskStatus;
     text: string;
+	addedDate: string;
   };
   onChangeStatus: (taskId: string, newStatus: TaskStatus) => void;
   onChangeTitle: (taskId: string, newTitle: string) => void;
@@ -56,6 +57,7 @@ export const TaskItem = ({
         onChangeTitle={changeTaskTitleHandler}
         disabled={disabled}
       />
+      <span>{new Date(task.addedDate).toLocaleDateString()}</span>
       <IconButton
         aria-label="delete"
         onClick={removeTaskHandler}

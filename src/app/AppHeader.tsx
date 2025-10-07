@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { MaterialUISwitch } from "@/common/components";
+import { CustomButton, MaterialUISwitch } from "@/common/components";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useAppSelector } from "@/common/hooks/useAppSelector";
 import { useAppDispatch } from "@/common/hooks/useAppDispatch";
@@ -14,6 +14,7 @@ import {
   selectTheme,
 } from "@/app/app-slice";
 import LinearProgress from "@mui/material/LinearProgress";
+import { logoutTC, selectAuth } from "@/features/auth/model/auth-slice";
 
 export type ThemeMode = "dark" | "light";
 
@@ -24,6 +25,8 @@ export const AppHeader = () => {
   const handleThemeToggle = () => {
     dispatch(changeThemeModeAC({ themeMode }));
   };
+  const { isLoggedIn } = useAppSelector(selectAuth);
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -40,7 +43,14 @@ export const AppHeader = () => {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Todo
           </Typography>
-          <Button color="inherit">Login</Button>
+          {isLoggedIn ? (
+            <CustomButton onClick={() => dispatch(logoutTC())}>
+              Logout
+            </CustomButton>
+          ) : (
+            <CustomButton>Login</CustomButton>
+          )}
+
           <MaterialUISwitch
             checked={themeMode === "dark"}
             onChange={handleThemeToggle}

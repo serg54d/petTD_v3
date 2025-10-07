@@ -31,10 +31,17 @@ body {
 	transition: background-color 0.3s ease;
 }
 
+a {
+	text-decoration: none;
+	color: inherit;
+	cursor: pointer;
+}
+
 .app {
 	height: 100vh;
 	display: flex;
 	flex-direction: column;
+	position: relative;
 }
 
 .app_add-todolist {
