@@ -1,6 +1,6 @@
 import { TodolistType } from "@/app/App";
 import { useAppDispatch } from "@/common/hooks/useAppDispatch";
-import { addTaskTC } from "@/features/Todolists/model/reducers/tasks-slice";
+import { addTask } from "@/features/Todolists/model/reducers/tasks-slice";
 import { nanoid } from "@reduxjs/toolkit";
 import { AddItemForm } from "@/common/components/AddItemForm";
 import { EmptyList } from "@/common/components";
@@ -11,8 +11,8 @@ import { TaskStatus } from "../../lib/enums";
 import { FilterValues } from "@/common/enums/enums";
 import {
   changeTodolistFilter,
-  changeTodolistTitleTC,
-  deleteTodolistTC,
+  changeTodolistTitle,
+  deleteTodolist,
 } from "../../model/reducers/todolists-slice";
 import { RequestStatus } from "@/common/types/types";
 
@@ -33,7 +33,7 @@ export const Todolist = (props: TodolistPropsType) => {
   const dispatch = useAppDispatch();
   const createTaskHandler = (title: string) => {
     dispatch(
-      addTaskTC({
+      addTask({
         todolistId: props.todolist.id,
         text: title,
         taskId: nanoid(),
@@ -43,10 +43,10 @@ export const Todolist = (props: TodolistPropsType) => {
   };
 
   const changeTodolistTitleHandler = async (title: string) => {
-    dispatch(changeTodolistTitleTC({ id: props.todolist.id, newTitle: title }));
+    dispatch(changeTodolistTitle({ id: props.todolist.id, newTitle: title }));
   };
   const deleteTodolistHandler = () => {
-    dispatch(deleteTodolistTC({ id: props.todolist.id }));
+    dispatch(deleteTodolist({ id: props.todolist.id }));
   };
 
   const changeTodolistFilterHandler = (newFilter: FilterValues) => {

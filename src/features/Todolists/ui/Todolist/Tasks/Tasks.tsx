@@ -1,9 +1,9 @@
 import List from "@mui/material/List";
 
 import {
-  changeTaskStatusTC,
-  changeTaskTitleTC,
-  removeTaskTC,
+  changeTaskStatus,
+  changeTaskTitle,
+  removeTask,
 } from "../../../model/reducers/tasks-slice";
 
 import { TaskType } from "@/features/Todolists/ui/Todolist/Todolist";
@@ -46,7 +46,7 @@ export const Tasks = (props: TasksPropsType) => {
     try {
       if (response.data.resultCode === ResultCode.Success) {
         dispatch(
-          changeTaskStatusTC({ todolistId: props.todolist.id, taskId, status })
+          changeTaskStatus({ todolistId: props.todolist.id, taskId, status })
         );
       }
     } catch (error) {
@@ -54,12 +54,10 @@ export const Tasks = (props: TasksPropsType) => {
     }
   };
   const changeTaskTitleHandler = (taskId: string, title: string) => {
-    dispatch(
-      changeTaskTitleTC({ todolistId: props.todolist.id, taskId, title })
-    );
+    dispatch(changeTaskTitle({ todolistId: props.todolist.id, taskId, title }));
   };
   const removeTaskHandler = (taskId: string) => {
-    dispatch(removeTaskTC({ todolistId: props.todolist.id, taskId }));
+    dispatch(removeTask({ todolistId: props.todolist.id, taskId }));
   };
   return (
     <List className="tasks-container">

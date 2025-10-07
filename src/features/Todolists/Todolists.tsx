@@ -4,9 +4,9 @@ import { TaskType, Todolist } from "@/features/Todolists/ui/Todolist/Todolist";
 
 import { useEffect } from "react";
 import { useAppDispatch } from "@/common/hooks/useAppDispatch";
-import { selectTasks, setTasksTC } from "./model/reducers/tasks-slice";
+import { selectTasks, setTasks } from "./model/reducers/tasks-slice";
 import {
-  fetchTodolistsTC,
+  fetchTodolists,
   selectTodolists,
 } from "./model/reducers/todolists-slice";
 import { TaskStatus } from "./lib/enums";
@@ -26,12 +26,12 @@ export const Todolists = () => {
   const tasks = useAppSelector(selectTasks);
 
   useEffect(() => {
-    dispatch(fetchTodolistsTC()).then((action) => {
+    dispatch(fetchTodolists()).then((action) => {
       // Проверяем, что запрос выполнен успешно
-      if (fetchTodolistsTC.fulfilled.match(action)) {
-        dispatch(setTasksTC());
+      if (fetchTodolists.fulfilled.match(action)) {
+        dispatch(setTasks());
       } else {
-        // Если запрос завершился с ошибкой, не вызываем setTasksTC
+        // Если запрос завершился с ошибкой, не вызываем setTasks
         console.log("Todolists not loaded, skipping tasks fetch");
       }
     });
